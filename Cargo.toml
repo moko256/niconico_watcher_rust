@@ -1,0 +1,32 @@
+[package]
+name = "niconico-watcher-rust"
+version = "0.1.0"
+authors = ["moko256 <koutaro.mo@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+async-trait = "0.1.40"
+cron = "0.6.1"
+serde = "1.0.116"
+log = "0.4.11"
+chrono = { version = "0.4.15", features = ["serde"]}
+tokio = { version = "0.2", features = ["full"] }
+
+[dependencies.reqwest]
+version = "0.10"
+default-features = false
+features = ["rustls-tls", "json"]
+
+[dependencies.serenity]
+version = "0.8.7"
+default-features = false
+features = [
+    "builder",
+    "client",
+    "http",
+    "model",
+    "utils",
+    "rustls_backend"
+]
