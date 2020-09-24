@@ -5,7 +5,11 @@ use reqwest::Error;
 
 use crate::vo::*;
 
-pub async fn search(client: &Client, query: &String, filter_time_latest_equal: String) -> Option<NicoResult> {
+pub async fn search(
+    client: &Client,
+    query: &String,
+    filter_time_latest_equal: String,
+) -> Option<NicoResult> {
     let r = request(
         client,
         format!(
@@ -23,7 +27,7 @@ pub async fn search(client: &Client, query: &String, filter_time_latest_equal: S
                 error!("HTTP Response != 200: {}", status_code);
                 None
             }
-        },
+        }
         Err(e) => {
             error!("HTTP Error\n{}", e);
             None
@@ -32,10 +36,5 @@ pub async fn search(client: &Client, query: &String, filter_time_latest_equal: S
 }
 
 async fn request(client: &Client, url: String) -> Result<NicoResult, Error> {
-    client
-        .get(&url)
-        .send()
-        .await?
-        .json::<NicoResult>()
-        .await
+    client.get(&url).send().await?.json::<NicoResult>().await
 }
