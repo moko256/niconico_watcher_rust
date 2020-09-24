@@ -19,13 +19,10 @@ mod vo;
 
 use model::State;
 use main_repo::MainRepo;
-use vo::*;
-
-
-const cron_config: &str = "* * * * * * *";
 
 #[tokio::main]
 async fn main() {
+    let cron_config: &str = "* * * * * * *";
     let query: String = "stormworks".to_string();
 
     let repo: MainRepo = MainRepo {
@@ -33,10 +30,11 @@ async fn main() {
         query: query
     };
 
-    let mut init_time: DateTime<Utc> = DateTime::parse_from_rfc3339("2020-09-23T00:00:00Z")
+    let init_time: DateTime<Utc> = DateTime::parse_from_rfc3339("2020-09-23T00:00:00Z")
         .unwrap()
         .with_timezone(&Utc);
-    let mut last_state: State = State {
+
+        let mut last_state: State = State {
         latest_time: init_time,
         movie_latest_time: Vec::with_capacity(0)
     };

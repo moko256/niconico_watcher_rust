@@ -1,12 +1,8 @@
-use std::future::Future;
-
 use async_trait::async_trait;
 use chrono::DateTime;
 use chrono::Utc;
 
 use crate::vo::*;
-use crate::nicovideo;
-use crate::main_repo;
 
 // Note: this algorithm is not consider when getVideos().len() > api query limit 
 pub async fn next_state(last_state: State, repo: &impl Repo) -> State {
@@ -55,6 +51,6 @@ impl State {
 
 #[async_trait]
 pub trait Repo {
-    async fn get_videos(&self, filterTimeLatestOrEqual: &DateTime<Utc>) -> Option<Vec<NicoVideo>>;
+    async fn get_videos(&self, filter_time_latest_equal: &DateTime<Utc>) -> Option<Vec<NicoVideo>>;
     async fn post_message(&self, message: &NicoVideo);
 }

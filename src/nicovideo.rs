@@ -1,5 +1,4 @@
-use std::future::Future;
-use log::{info, error};
+use log::error;
 
 use reqwest::Client;
 use reqwest::Error;
@@ -15,7 +14,7 @@ pub async fn search(client: &Client, query: &String, limit: i32) -> Option<NicoR
             limit
         )
     ).await;
-    match(r) {
+    match r {
         Ok(v) => {
             Some(v)
         },
