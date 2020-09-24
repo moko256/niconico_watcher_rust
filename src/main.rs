@@ -9,6 +9,9 @@ use chrono::DateTime;
 use chrono::Utc;
 use cron::Schedule;
 use reqwest::Client;
+use log::LevelFilter;
+use log::info;
+use simple_logger::SimpleLogger;
 
 mod tests;
 
@@ -22,8 +25,10 @@ use main_repo::MainRepo;
 
 #[tokio::main]
 async fn main() {
+    SimpleLogger::new().with_level(LevelFilter::Info).init().unwrap();
+
     let cron_config: &str = "* * * * * * *";
-    let query: String = "stormworks".to_string();
+    let query: String = "Stormworks".to_string();
 
     let repo: MainRepo = MainRepo {
         client: Client::new(),
@@ -39,13 +44,13 @@ async fn main() {
         movie_latest_time: Vec::with_capacity(0)
     };
 
-    for nt in Schedule::from_str(cron_config).unwrap().upcoming(Utc).take(2) {
+    for nt in Schedule::from_str(cron_config).unwrap().upcoming(Utc).take(1) {
         let wait_s = Duration::from_secs(
             TryFrom::try_from((nt - Utc::now()).num_seconds()).unwrap(),
         );
         tokio::time::delay_for(wait_s).await;
 
-        println!("{}", nt.format("%F %R").to_string());
+        info!("{}", nt.format("%F %R").to_string());
 
         last_state = model::next_state(last_state, &repo).await;
     }
