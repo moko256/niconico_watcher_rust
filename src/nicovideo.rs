@@ -7,7 +7,7 @@ use crate::vo::*;
 
 pub async fn search(
     client: &Client,
-    query: &String,
+    query: &str,
     filter_time_latest_equal: String,
 ) -> Option<NicoResult> {
     let r = request(

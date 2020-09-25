@@ -6,7 +6,7 @@ use crate::vo::*;
 
 // Note: this algorithm is not consider when getVideos().len() > api query limit
 pub async fn next_state(last_state: State, repo: &impl Repo) -> State {
-    let last_state_time = (&last_state).latest_time;
+    let last_state_time = last_state.latest_time;
     let data = repo.get_videos(&last_state_time).await;
     if data.is_none() {
         return last_state;
@@ -34,10 +34,10 @@ pub async fn next_state(last_state: State, repo: &impl Repo) -> State {
             movie_latest_time.push(n);
         }
     }
-    return State {
-        latest_time: latest_time,
-        movie_latest_time: movie_latest_time,
-    };
+    State {
+        latest_time,
+        movie_latest_time,
+    }
 }
 
 pub struct State {
