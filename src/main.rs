@@ -8,7 +8,6 @@ use std::time::Duration;
 use chrono::DateTime;
 use chrono::Utc;
 use cron::Schedule;
-use log::info;
 use log::LevelFilter;
 use reqwest::Client;
 use simple_logger::SimpleLogger;
@@ -30,7 +29,7 @@ async fn main() {
         .init()
         .unwrap();
 
-    let cron_config: &str = "* * * * * * *";
+    let cron_config: &str = "0 0/10 * * * * *";
     let query: String = "Stormworks".to_string();
 
     let repo: MainRepo = MainRepo {
@@ -50,13 +49,10 @@ async fn main() {
     for nt in Schedule::from_str(cron_config)
         .unwrap()
         .upcoming(Utc)
-        .take(1)
     {
         let wait_s =
             Duration::from_secs(TryFrom::try_from((nt - Utc::now()).num_seconds()).unwrap());
         tokio::time::delay_for(wait_s).await;
-
-        info!("{}", nt.format("%F %R").to_string());
 
         last_state = model::next_state(last_state, &repo).await;
     }

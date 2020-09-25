@@ -27,6 +27,6 @@ impl Repo for MainRepo {
     }
 
     async fn post_message(&self, message: &NicoVideo) {
-        info!("{}", message.title);
+        info!("【新着動画】{} ({})", message.title, message.content_id);
     }
 }
