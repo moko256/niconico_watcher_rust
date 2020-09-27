@@ -12,6 +12,7 @@ cron = "0.6.1"
 serde = "1.0.116"
 log = "0.4.11"
 simple_logger = "1.9.0"
+dotenv = "0.15.0"
 chrono = { version = "0.4.15", features = ["serde"]}
 tokio = { version = "0.2", features = ["full"] }
 
@@ -32,3 +33,6 @@ features = [
     "utils",
     "rustls_backend"
 ]
+
+[dev-dependencies]
+lazy_static = "1.4.0"

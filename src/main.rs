@@ -12,12 +12,14 @@ use simple_logger::SimpleLogger;
 
 mod tests;
 
+mod config;
 mod main_repo;
 mod model;
 mod nicovideo;
 mod time;
 mod vo;
 
+use config::*;
 use main_repo::MainRepo;
 use model::State;
 
@@ -28,12 +30,11 @@ async fn main() {
         .init()
         .unwrap();
 
-    let cron_config: &str = "0 0/10 * * * * *";
-    let query: String = "Stormworks".to_string();
+    let config = load_conf();
 
     let repo: MainRepo = MainRepo {
         client: Client::new(),
-        query,
+        query: config.keyword,
     };
 
     let init_time: DateTime<Utc> = DateTime::parse_from_rfc3339("2020-09-23T00:00:00Z")
@@ -45,7 +46,7 @@ async fn main() {
         movie_latest_time: Vec::with_capacity(0),
     };
 
-    for nt in Schedule::from_str(cron_config).unwrap().upcoming(Utc) {
+    for nt in Schedule::from_str(&config.cron).unwrap().upcoming(Utc) {
         time::wait_until(nt.with_timezone(&Utc)).await;
 
         last_state = model::next_state(last_state, &repo).await;
