@@ -1,9 +1,7 @@
 extern crate chrono;
 extern crate cron;
 
-use std::convert::TryFrom;
 use std::str::FromStr;
-use std::time::Duration;
 
 use chrono::DateTime;
 use chrono::Utc;
@@ -17,6 +15,7 @@ mod tests;
 mod main_repo;
 mod model;
 mod nicovideo;
+mod time;
 mod vo;
 
 use main_repo::MainRepo;
@@ -47,9 +46,7 @@ async fn main() {
     };
 
     for nt in Schedule::from_str(cron_config).unwrap().upcoming(Utc) {
-        let wait_s =
-            Duration::from_secs(TryFrom::try_from((nt - Utc::now()).num_seconds()).unwrap());
-        tokio::time::delay_for(wait_s).await;
+        time::wait_until(nt.with_timezone(&Utc)).await;
 
         last_state = model::next_state(last_state, &repo).await;
     }
