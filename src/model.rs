@@ -4,7 +4,7 @@ use chrono::Utc;
 
 use crate::vo::*;
 
-// Note: this algorithm is not consider when getVideos().len() > api query limit
+// Note: this algorithm does not consider when getVideos().len() > api query limit
 pub async fn next_state(last_state: State, repo: &impl Repo) -> State {
     let last_state_time = last_state.latest_time;
     let data = repo.get_videos(&last_state_time).await;
