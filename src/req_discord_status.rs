@@ -27,7 +27,7 @@ struct Handler;
 impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, _data_about_bot: Ready) {
         ctx.set_activity(gen_status()).await;
-        info!(target: "Discord", "Set status.");
+        info!(target: "nicow", "Discord: Set status.");
     }
 }
 

@@ -30,7 +30,8 @@ use req_discord_post::ReqDiscordPost;
 #[tokio::main]
 async fn main() {
     SimpleLogger::new()
-        .with_level(LevelFilter::Info)
+        .with_level(LevelFilter::Warn)
+        .with_module_level("nicow", LevelFilter::Info)
         .init()
         .unwrap();
 
@@ -53,7 +54,7 @@ async fn main() {
         movie_latest_time: Vec::with_capacity(0),
     };
 
-    info!(target: "main", "Ready.");
+    info!(target: "nicow", "main: Ready.");
     for nt in Schedule::from_str(&config.cron).unwrap().upcoming(Utc) {
         time::wait_until(nt.with_timezone(&Utc)).await;
 

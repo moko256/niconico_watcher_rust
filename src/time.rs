@@ -17,7 +17,7 @@ pub async fn wait_until(when: DateTime<Utc>) {
             delay_for(wait_s).await;
         }
         Err(_err) => {
-            error!(target: "time", "Schedule was gone. Skipped.");
+            error!(target: "nicow", "time: Schedule was gone. Skipped.");
         }
     }
 }

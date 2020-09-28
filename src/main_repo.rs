@@ -30,7 +30,7 @@ impl Repo for MainRepo {
 
     async fn post_message(&mut self, message: &NicoVideo) {
         // New: sm000 "title"
-        info!(target: "NicoSearchRepo", "New: {} \"{}\"", message.content_id, message.title);
+        info!(target: "nicow", "New Movie: {} \"{}\"", message.content_id, message.title);
 
         //【新着動画】title
         //ttps://nico.ms/sm000

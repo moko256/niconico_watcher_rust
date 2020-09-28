@@ -16,7 +16,7 @@ pub fn get_conf() -> Config {
         .map(|s| {
             let p = s.parse::<bool>();
             if p.is_err() {
-                warn!(target: ".env", "Cannot parse DRYRUN value: {}. Fall-back to dry-run mode.", s);
+                warn!(target: "nicow", ".env: Cannot parse DRYRUN value: {}. Fall-back to dry-run mode.", s);
             }
             p.unwrap_or(true)
         })
@@ -30,7 +30,7 @@ pub fn get_conf() -> Config {
             cron,
         }
     } else {
-        warn!(target: ".env", "TOKEN or CHID is null value. Fall-back to dry-run mode.");
+        warn!(target: "nicow", ".env: TOKEN or CHID is null value. Fall-back to dry-run mode.");
         Config {
             token: "".to_string(),
             keyword,

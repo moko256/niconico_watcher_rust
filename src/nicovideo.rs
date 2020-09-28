@@ -24,12 +24,12 @@ pub async fn search(
             if status_code == 200 {
                 Some(v)
             } else {
-                error!(target: "HTTP", "Status {} != 200", status_code);
+                error!(target: "nicow", "HTTP: Status {} != 200", status_code);
                 None
             }
         }
         Err(e) => {
-            error!(target: "HTTP", "{}", e);
+            error!(target: "nicow", "HTTP: {}", e);
             None
         }
     }
