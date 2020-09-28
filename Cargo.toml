@@ -14,8 +14,21 @@ log = "0.4.11"
 simple_logger = "1.9.0"
 dotenv = "0.15.0"
 chrono = { version = "0.4.15", features = ["serde"]}
-tokio = { version = "0.2", features = ["full"] }
 
+[dependencies.tokio]
+version = "0.2.22"
+default-features = false
+features = [
+    "fs",
+    "macros",
+    "rt-core",
+    "sync",
+    "time",
+    "udp",
+    "process",
+    "dns",
+    "io-driver",
+]
 
 [dependencies.reqwest]
 version = "0.10"
@@ -26,12 +39,10 @@ features = ["rustls-tls", "json"]
 version = "0.9.0-rc.2"
 default-features = false
 features = [
-    "builder",
     "client",
     "http",
     "gateway",
     "model",
-    "utils",
     "rustls_backend",
 ]
 
