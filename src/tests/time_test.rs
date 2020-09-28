@@ -1,7 +1,7 @@
 use crate::time::*;
-use tokio::runtime::Runtime;
 use chrono::Duration;
 use chrono::Utc;
+use tokio::runtime::Runtime;
 
 #[test]
 fn time_test() {
