@@ -6,8 +6,8 @@ use reqwest::Client;
 
 use crate::model::Repo;
 use crate::nicovideo;
-use crate::vo::*;
 use crate::req_discord_post::ReqDiscordPost;
+use crate::vo::*;
 
 pub struct MainRepo {
     pub http: Client,
@@ -34,8 +34,11 @@ impl Repo for MainRepo {
 
         //【新着動画】title
         //ttps://nico.ms/sm000
-        self.discord.post(
-            format!("**【新着動画】**{}\nhttps://nico.ms/{}", message.title, message.content_id)
-        ).await;
+        self.discord
+            .post(format!(
+                "**【新着動画】**{}\nhttps://nico.ms/{}",
+                message.title, message.content_id
+            ))
+            .await;
     }
 }

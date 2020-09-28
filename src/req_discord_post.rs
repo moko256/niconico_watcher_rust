@@ -1,5 +1,5 @@
-use serenity::model::id::ChannelId;
 use serenity::http::client::Http;
+use serenity::model::id::ChannelId;
 
 use crate::config::Config;
 
@@ -17,10 +17,7 @@ impl ReqDiscordPost {
                 ch,
             }
         } else {
-            ReqDiscordPost {
-                http: None,
-                ch,
-            }
+            ReqDiscordPost { http: None, ch }
         }
     }
 

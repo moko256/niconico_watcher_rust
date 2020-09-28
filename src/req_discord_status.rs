@@ -1,11 +1,11 @@
 use log::info;
 use serenity::async_trait;
-use serenity::Client;
 use serenity::client::Context;
-use serenity::model::gateway::Ready;
 use serenity::client::EventHandler;
 use serenity::model::gateway::Activity;
 use serenity::model::gateway::ActivityType;
+use serenity::model::gateway::Ready;
+use serenity::Client;
 
 use crate::config::Config;
 
@@ -32,11 +32,12 @@ impl EventHandler for Handler {
 }
 
 fn gen_status() -> Activity {
-    unsafe { // I am very sad, but this is a necessary magic…
+    unsafe {
+        // I am very sad, but this is a necessary magic…
         let mut s = Activity::listening("ニコニコ動画(Re)");
         let v = 3;
         let vp = (&v as *const i32) as *const ActivityType;
         s.kind = *vp;
-        return s
+        s
     }
 }
