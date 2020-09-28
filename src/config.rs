@@ -15,7 +15,11 @@ pub fn get_conf() -> Config {
     let dryrun = dotenv::var("DRYRUN")
         .map(|s| {
             let p = s.parse::<bool>();
-            if p.is_err() {
+            if let Ok(v) = p {
+                if v {
+                    warn!(target: "nicow", ".env: Running dry-run mode.");    
+                }
+            } else {
                 warn!(target: "nicow", ".env: Cannot parse DRYRUN value: {}. Fall-back to dry-run mode.", s);
             }
             p.unwrap_or(true)
