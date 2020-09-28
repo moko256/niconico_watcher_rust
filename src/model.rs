@@ -5,7 +5,7 @@ use chrono::Utc;
 use crate::vo::*;
 
 // Note: this algorithm does not consider when getVideos().len() > api query limit
-pub async fn next_state(last_state: State, repo: &impl Repo) -> State {
+pub async fn next_state(last_state: State, repo: &mut impl Repo) -> State {
     let last_state_time = last_state.latest_time;
     let data = repo.get_videos(&last_state_time).await;
     if data.is_none() {
@@ -56,5 +56,5 @@ impl State {
 #[async_trait]
 pub trait Repo {
     async fn get_videos(&self, filter_time_latest_equal: &DateTime<Utc>) -> Option<Vec<NicoVideo>>;
-    async fn post_message(&self, message: &NicoVideo);
+    async fn post_message(&mut self, message: &NicoVideo);
 }
