@@ -9,10 +9,10 @@ use cron::Schedule;
 use log::info;
 use log::LevelFilter;
 use reqwest::Client;
-use simple_logger::SimpleLogger;
 
 mod tests;
 
+mod app_logger;
 mod config;
 mod main_repo;
 mod model;
@@ -22,6 +22,7 @@ mod req_discord_status;
 mod time;
 mod vo;
 
+use app_logger::AppLogger;
 use config::*;
 use main_repo::MainRepo;
 use model::State;
@@ -29,11 +30,7 @@ use req_discord_post::ReqDiscordPost;
 
 #[tokio::main]
 async fn main() {
-    SimpleLogger::new()
-        .with_level(LevelFilter::Warn)
-        .with_module_level("nicow", LevelFilter::Info)
-        .init()
-        .unwrap();
+    AppLogger::init().unwrap();
 
     let config = load_conf();
 
