@@ -21,8 +21,8 @@ impl AppLogger {
 }
 impl Log for AppLogger {
     fn enabled(&self, metadata: &Metadata) -> bool {
-        (metadata.target() == "nicow" && metadata.level() >= Level::Info)
-            || metadata.level() >= Level::Warn
+        (metadata.target() == "nicow" && metadata.level() <= Level::Info)
+            || metadata.level() <= Level::Warn
     }
 
     fn log(&self, record: &Record) {
