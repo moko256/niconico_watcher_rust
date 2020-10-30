@@ -7,7 +7,6 @@ use chrono::DateTime;
 use chrono::Utc;
 use cron::Schedule;
 use log::info;
-use log::LevelFilter;
 use reqwest::Client;
 
 mod tests;

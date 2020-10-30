@@ -1,5 +1,4 @@
 use log::*;
-use std::io::{self, Write};
 
 static APP_LOGGER: AppLogger = AppLogger;
 pub struct AppLogger;
