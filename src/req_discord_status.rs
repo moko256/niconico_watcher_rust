@@ -11,7 +11,7 @@ use crate::config::Config;
 
 pub async fn set_status(config: &Config) {
     if !config.dryrun {
-        let client = Client::new(config.token.to_string())
+        let client = Client::builder(config.token.to_string())
             .event_handler(Handler)
             .await
             .unwrap();
