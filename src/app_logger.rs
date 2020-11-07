@@ -3,7 +3,7 @@ use log::*;
 static APP_LOGGER: AppLogger = AppLogger;
 pub struct AppLogger;
 impl AppLogger {
-    fn to_severity_rfc5424(level: Level) -> usize {
+    fn level_to_severity_rfc5424(level: Level) -> usize {
         match level {
             Level::Trace => 7,
             Level::Debug => 7,
@@ -29,7 +29,7 @@ impl Log for AppLogger {
         if self.enabled(record.metadata()) {
             println!(
                 "<{}>{} - {}",
-                AppLogger::to_severity_rfc5424(record.level()),
+                AppLogger::level_to_severity_rfc5424(record.level()),
                 record.target(),
                 record.args()
             );
