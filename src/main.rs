@@ -16,8 +16,7 @@ mod config;
 mod main_repo;
 mod model;
 mod nicovideo;
-mod req_discord_post;
-mod req_discord_status;
+mod req_discord;
 mod time;
 mod vo;
 
@@ -25,7 +24,7 @@ use app_logger::AppLogger;
 use config::*;
 use main_repo::MainRepo;
 use model::State;
-use req_discord_post::ReqDiscordPost;
+use req_discord::ReqDiscord;
 
 #[tokio::main]
 async fn main() {
@@ -33,12 +32,11 @@ async fn main() {
 
     let config = load_conf();
 
-    req_discord_status::set_status(&config).await;
+    let req_discord = ReqDiscord::try_new(&config).await;
 
-    let req_discord_post = ReqDiscordPost::new(&config).await;
     let mut repo: MainRepo = MainRepo {
         http: Client::new(),
-        discord: req_discord_post,
+        discord: req_discord,
         query: config.keyword,
     };
 

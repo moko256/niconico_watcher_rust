@@ -1,18 +1,18 @@
 use async_trait::async_trait;
 use chrono::DateTime;
-use chrono::Utc;
 use chrono::SecondsFormat;
+use chrono::Utc;
 use log::info;
 use reqwest::Client;
 
 use crate::model::Repo;
 use crate::nicovideo;
-use crate::req_discord_post::ReqDiscordPost;
+use crate::req_discord::ReqDiscord;
 use crate::vo::*;
 
 pub struct MainRepo {
     pub http: Client,
-    pub discord: ReqDiscordPost,
+    pub discord: Option<ReqDiscord>,
     pub query: String,
 }
 #[async_trait]
@@ -30,16 +30,18 @@ impl Repo for MainRepo {
     }
 
     async fn post_message(&mut self, message: &NicoVideo) {
-        // New: sm000 "title"
+        // New movie: sm000 "title"
         info!(target: "nicow", "New Movie: {} \"{}\"", message.content_id, message.title);
 
-        //【新着動画】title
-        //ttps://nico.ms/sm000
-        self.discord
-            .post(format!(
-                "**【新着動画】**{}\nhttps://nico.ms/{}",
-                message.title, message.content_id
-            ))
-            .await;
+        if let Some(discord) = &mut self.discord {
+            //【新着動画】title
+            //ttps://nico.ms/sm000
+            discord
+                .post(format!(
+                    "**【新着動画】**{}\nhttps://nico.ms/{}",
+                    message.title, message.content_id
+                ))
+                .await;
+        }
     }
 }
