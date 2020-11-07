@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use chrono::DateTime;
 use chrono::Utc;
+use chrono::SecondsFormat;
 use log::info;
 use reqwest::Client;
 
@@ -21,7 +22,7 @@ impl Repo for MainRepo {
             nicovideo::search(
                 &self.http,
                 &self.query,
-                filter_time_latest_equal.to_rfc3339(),
+                filter_time_latest_equal.to_rfc3339_opts(SecondsFormat::Millis, true),
             )
             .await?
             .data,

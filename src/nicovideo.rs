@@ -15,7 +15,7 @@ pub async fn search(
         format!(
             "https://api.search.nicovideo.jp/api/v2/video/contents/search?q={}&targets=tags&fields=contentId,title,startTime&_sort=-startTime&_limit=100&filters[startTime][gte]={}",
             query,
-            filter_time_latest_equal.replace("+", "%2B")
+            filter_time_latest_equal
         )
     ).await;
     match r {
