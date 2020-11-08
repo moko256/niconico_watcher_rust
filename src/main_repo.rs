@@ -1,6 +1,5 @@
 use async_trait::async_trait;
 use chrono::DateTime;
-use chrono::SecondsFormat;
 use chrono::Utc;
 use log::info;
 use reqwest::Client;
@@ -19,13 +18,9 @@ pub struct MainRepo {
 impl Repo for MainRepo {
     async fn get_videos(&self, filter_time_latest_equal: &DateTime<Utc>) -> Option<Vec<NicoVideo>> {
         Some(
-            nicovideo::search(
-                &self.http,
-                &self.query,
-                filter_time_latest_equal.to_rfc3339_opts(SecondsFormat::Millis, true),
-            )
-            .await?
-            .data,
+            nicovideo::search(&self.http, &self.query, filter_time_latest_equal)
+                .await?
+                .data,
         )
     }
 
