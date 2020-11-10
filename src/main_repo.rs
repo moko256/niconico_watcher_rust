@@ -2,15 +2,14 @@ use async_trait::async_trait;
 use chrono::DateTime;
 use chrono::Utc;
 use log::info;
-use reqwest::Client;
 
 use crate::model::Repo;
-use crate::nicovideo;
 use crate::req_discord::ReqDiscord;
+use crate::req_nicovideo::ReqNicoVideo;
 use crate::vo::*;
 
 pub struct MainRepo {
-    pub http: Client,
+    pub nico: ReqNicoVideo,
     pub discord: Option<ReqDiscord>,
     pub query: String,
 }
@@ -18,7 +17,8 @@ pub struct MainRepo {
 impl Repo for MainRepo {
     async fn get_videos(&self, filter_time_latest_equal: &DateTime<Utc>) -> Option<Vec<NicoVideo>> {
         Some(
-            nicovideo::search(&self.http, &self.query, filter_time_latest_equal)
+            self.nico
+                .search(&self.query, filter_time_latest_equal)
                 .await?
                 .data,
         )

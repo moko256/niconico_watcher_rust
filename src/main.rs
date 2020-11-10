@@ -1,13 +1,9 @@
-extern crate chrono;
-extern crate cron;
-
 use std::str::FromStr;
 
 use chrono::DateTime;
 use chrono::Utc;
 use cron::Schedule;
 use log::info;
-use reqwest::Client;
 
 mod tests;
 
@@ -15,8 +11,8 @@ mod app_logger;
 mod config;
 mod main_repo;
 mod model;
-mod nicovideo;
 mod req_discord;
+mod req_nicovideo;
 mod time;
 mod vo;
 
@@ -25,6 +21,7 @@ use config::*;
 use main_repo::MainRepo;
 use model::State;
 use req_discord::ReqDiscord;
+use req_nicovideo::ReqNicoVideo;
 
 #[tokio::main]
 async fn main() {
@@ -32,11 +29,9 @@ async fn main() {
 
     let config = load_conf();
 
-    let req_discord = ReqDiscord::try_new(&config).await;
-
     let mut repo: MainRepo = MainRepo {
-        http: Client::new(),
-        discord: req_discord,
+        nico: ReqNicoVideo::new(),
+        discord: ReqDiscord::try_new(&config).await,
         query: config.keyword,
     };
 
