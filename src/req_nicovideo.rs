@@ -18,6 +18,7 @@ impl ReqNicoVideo {
         let client = Client::builder()
             .user_agent("nicow")
             .pool_max_idle_per_host(0) // api server close connection in about 90 secs
+            .tcp_keepalive(None)
             .build()
             .unwrap();
 
