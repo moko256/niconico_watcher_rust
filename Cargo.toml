@@ -51,6 +51,3 @@ features = [
     "model",
     "rustls_backend",
 ]
-
-[dev-dependencies]
-lazy_static = "1.4.0"

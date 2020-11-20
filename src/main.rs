@@ -4,6 +4,7 @@ use chrono::DateTime;
 use chrono::Utc;
 use cron::Schedule;
 use log::info;
+use log::warn;
 
 mod tests;
 
@@ -28,6 +29,9 @@ async fn main() {
     AppLogger::init().unwrap();
 
     let config = load_conf();
+    if config.dryrun {
+        warn!(target: "nicow", ".env: Running dry-run mode.");
+    }
 
     let mut repo: MainRepo = MainRepo {
         nico: ReqNicoVideo::new(),
