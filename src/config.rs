@@ -1,5 +1,5 @@
-use std::str::FromStr;
 use dotenv::dotenv;
+use std::str::FromStr;
 
 pub fn load_conf() -> Config {
     dotenv().ok();
