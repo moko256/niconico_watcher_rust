@@ -16,7 +16,7 @@ pub struct ReqNicoVideo {
 impl ReqNicoVideo {
     pub fn new() -> ReqNicoVideo {
         let client = Client::builder()
-            .user_agent("nicow")
+            .user_agent(env!("CARGO_PKG_NAME"))
             .pool_max_idle_per_host(0) // api server close connection in about 90 secs
             .tcp_keepalive(None)
             .build()
