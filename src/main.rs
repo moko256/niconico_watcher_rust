@@ -24,7 +24,7 @@ use model::State;
 use req_discord::ReqDiscord;
 use req_nicovideo::ReqNicoVideo;
 
-#[tokio::main]
+#[tokio::main(flavor = "current_thread")]
 async fn main() {
     AppLogger::init().unwrap();
 

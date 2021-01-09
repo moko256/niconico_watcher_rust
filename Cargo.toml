@@ -14,35 +14,29 @@ panic = "abort"
 
 
 [dependencies]
-async-trait = "0.1.41"
+async-trait = "0.1.42"
 cron = "0.6.1"
-serde = "1.0.117"
+serde = "1.0.118"
 dotenv = "0.15.0"
 chrono = { version = "0.4.19", features = ["serde"]}
 log = { version = "0.4.11", features = ["max_level_info"]}
 
 [dependencies.tokio]
-version = "0.2.22"
+version = "1.0.1"
 default-features = false
 features = [
-    "fs",
     "macros",
-    "rt-core",
-    "sync",
+    "rt",
     "time",
-    "udp",
-    "process",
-    "dns",
-    "io-driver",
 ]
 
 [dependencies.reqwest]
-version = "0.10.9"
+version = "0.11.0"
 default-features = false
 features = ["rustls-tls", "json"]
 
 [dependencies.serenity]
-version = "0.9.1"
+version = "0.10.1"
 default-features = false
 features = [
     "client",

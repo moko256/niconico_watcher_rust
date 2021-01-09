@@ -4,7 +4,7 @@ use std::convert::TryFrom;
 use chrono::DateTime;
 use chrono::Utc;
 
-use tokio::time::delay_for;
+use tokio::time::sleep;
 use tokio::time::Duration;
 
 pub async fn wait_until(when: DateTime<Utc>) {
@@ -14,7 +14,7 @@ pub async fn wait_until(when: DateTime<Utc>) {
     match wait_s {
         Ok(wait_s) => {
             let wait_s = Duration::from_secs(wait_s);
-            delay_for(wait_s).await;
+            sleep(wait_s).await;
         }
         Err(_err) => {
             error!(target: "nicow", "time: Schedule was gone. Skipped.");
