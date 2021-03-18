@@ -1,11 +1,11 @@
 use crate::time::*;
 use chrono::Duration;
 use chrono::Utc;
-use tokio::runtime::Runtime;
+use tokio::runtime::Builder;
 
 #[test]
 fn time_test() {
-    let mut rt = Runtime::new().unwrap();
+    let rt = Builder::new_current_thread().enable_time().build().unwrap();
     rt.block_on(async {
         //Not panic normally.
         wait_until(Utc::now() + Duration::seconds(1)).await;
