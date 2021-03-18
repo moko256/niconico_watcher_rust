@@ -16,10 +16,11 @@ panic = "abort"
 [dependencies]
 async-trait = "0.1.42"
 cron = "0.6.1"
-serde = "1.0.118"
 dotenv = "0.15.0"
 chrono = { version = "0.4.19", features = ["serde"]}
 log = { version = "0.4.11", features = ["max_level_info"]}
+atom_syndication = "0.9.1"
+bytes = "1.0.1"
 
 [dependencies.tokio]
 version = "1.0.1"

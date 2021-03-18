@@ -1,11 +1,15 @@
 use log::error;
 
 use reqwest::Client;
-use reqwest::Error;
+use std::error::Error;
 
+use chrono::offset::FixedOffset;
 use chrono::DateTime;
-use chrono::SecondsFormat;
 use chrono::Utc;
+
+use bytes::buf::Buf;
+
+use atom_syndication::Feed;
 
 use crate::vo::*;
 
@@ -26,13 +30,16 @@ impl ReqNicoVideo {
     }
 
     pub async fn search(&self, query: &str, start_time_gte: &DateTime<Utc>) -> Option<NicoResult> {
-        let r = self.request(
-            format!(
-                "https://api.search.nicovideo.jp/api/v2/video/contents/search?q={}&targets=tags&fields=contentId,title,startTime&_sort=-startTime&_limit=100&filters[startTime][gte]={}",
+        let r = self
+            .request(format!(
+                "http://www.nicovideo.jp/tag/{}?rss=atom&sort=f&order=d&start={}",
                 query,
-                start_time_gte.to_rfc3339_opts(SecondsFormat::Millis, true),
-            )
-        ).await;
+                start_time_gte
+                    .with_timezone::<FixedOffset>(&FixedOffset::east(9 * 3600))
+                    .format("%Y-%m-%d")
+                    .to_string(),
+            ))
+            .await;
         match r {
             Ok(v) => {
                 let status_code = v.meta.status;
@@ -50,12 +57,23 @@ impl ReqNicoVideo {
         }
     }
 
-    async fn request(&self, url: String) -> Result<NicoResult, Error> {
-        (&self.client)
-            .get(&url)
-            .send()
-            .await?
-            .json::<NicoResult>()
-            .await
+    async fn request(&self, url: String) -> Result<NicoResult, Box<dyn Error>> {
+        let response = (&self.client).get(&url).send().await?;
+        let status = response.status().as_u16() as i64;
+        let feeds = Feed::read_from(response.bytes().await?.reader())?.entries;
+
+        let mut videos = Vec::with_capacity(feeds.len());
+        for feed in feeds {
+            videos.push(NicoVideo {
+                title: feed.title,
+                content_id: feed.id.split("/").collect::<Vec<&str>>()[2].to_string(),
+                start_time: feed.published.unwrap().with_timezone::<Utc>(&Utc),
+            })
+        }
+
+        Ok(NicoResult {
+            data: videos,
+            meta: NicoMeta { status },
+        })
     }
 }
