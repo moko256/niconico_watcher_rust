@@ -42,15 +42,12 @@ async fn main() {
     let init_time: DateTime<Utc> = Utc::now();
     //DateTime::parse_from_rfc3339("2020-09-28T00:00:00Z").unwrap().with_timezone(&Utc);
 
-    let mut last_state: State = State {
-        latest_time: init_time,
-        movie_latest_time: Vec::with_capacity(0),
-    };
+    let mut state = State::new(init_time);
 
     info!(target: "nicow", "main: Ready.");
     for nt in Schedule::from_str(&config.cron).unwrap().upcoming(Utc) {
         time::wait_until(nt.with_timezone(&Utc)).await;
 
-        last_state = model::next_state(last_state, &mut repo).await;
+        state.next_state(&mut repo).await;
     }
 }
