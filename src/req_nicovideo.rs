@@ -1,5 +1,6 @@
 use log::error;
 
+use once_cell::sync::Lazy;
 use reqwest::Client;
 use std::error::Error;
 
@@ -12,6 +13,8 @@ use bytes::buf::Buf;
 use atom_syndication::Feed;
 
 use crate::vo::*;
+
+const JST: Lazy<FixedOffset> = Lazy::new(|| FixedOffset::east(9 * 3600));
 
 pub struct ReqNicoVideo {
     client: Client,
@@ -35,7 +38,7 @@ impl ReqNicoVideo {
                 "http://www.nicovideo.jp/tag/{}?rss=atom&sort=f&order=d&start={}",
                 query,
                 start_time_gte
-                    .with_timezone::<FixedOffset>(&FixedOffset::east(9 * 3600))
+                    .with_timezone(&*JST)
                     .format("%Y-%m-%d")
                     .to_string(),
             ))
