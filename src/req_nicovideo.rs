@@ -36,7 +36,7 @@ impl ReqNicoVideo {
     pub async fn search(&self, query: &str, start_time_gte: &DateTime<Utc>) -> Option<NicoResult> {
         let r = self
             .request(format!(
-                "http://www.nicovideo.jp/tag/{}?rss=atom&sort=f&order=d&start={}",
+                "https://www.nicovideo.jp/tag/{}?rss=atom&sort=f&order=d&start={}",
                 query,
                 start_time_gte
                     .with_timezone(&*JST)
