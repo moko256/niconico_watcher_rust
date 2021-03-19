@@ -11,6 +11,7 @@ use chrono::Utc;
 use bytes::buf::Buf;
 
 use atom_syndication::Feed;
+use quick_xml::escape::unescape as entity_unescape;
 
 use crate::vo::*;
 
@@ -68,7 +69,7 @@ impl ReqNicoVideo {
         let mut videos = Vec::with_capacity(feeds.len());
         for feed in feeds {
             videos.push(NicoVideo {
-                title: feed.title,
+                title: String::from_utf8(entity_unescape(feed.title.as_bytes())?.into_owned())?,
                 content_id: feed.id.split("/").collect::<Vec<&str>>()[2].to_string(),
                 start_time: feed.published.unwrap().with_timezone::<Utc>(&Utc),
             })
