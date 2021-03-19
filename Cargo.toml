@@ -17,7 +17,7 @@ panic = "abort"
 async-trait = "0.1.48"
 atom_syndication = "0.9.1"
 bytes = "1.0.1"
-chrono = { version = "0.4.19", features = ["serde"]}
+chrono = "0.4.19"
 cron = "0.8.0"
 dotenv = "0.15.0"
 log = { version = "0.4.14", features = ["max_level_info"]}
@@ -36,7 +36,7 @@ features = [
 [dependencies.reqwest]
 version = "0.11.2"
 default-features = false
-features = ["rustls-tls", "json"]
+features = ["rustls-tls"]
 
 [dependencies.serenity]
 version = "0.10.4"
