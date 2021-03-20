@@ -16,12 +16,7 @@ pub struct MainRepo {
 #[async_trait]
 impl Repo for MainRepo {
     async fn get_videos(&self, filter_time_latest_equal: &DateTime<Utc>) -> Option<Vec<NicoVideo>> {
-        Some(
-            self.nico
-                .search(filter_time_latest_equal)
-                .await?
-                .data,
-        )
+        Some(self.nico.search(filter_time_latest_equal).await?.data)
     }
 
     async fn post_message(&mut self, message: &NicoVideo) {

@@ -18,7 +18,7 @@ use form_urlencoded::byte_serialize;
 use crate::config::Config;
 use crate::vo::*;
 
-const JST: Lazy<FixedOffset> = Lazy::new(|| FixedOffset::east(9 * 3600));
+static JST: Lazy<FixedOffset> = Lazy::new(|| FixedOffset::east(9 * 3600));
 
 pub struct ReqNicoVideo {
     client: Client,
@@ -74,7 +74,7 @@ impl ReqNicoVideo {
         for feed in feeds {
             videos.push(NicoVideo {
                 title: String::from_utf8(entity_unescape(feed.title.as_bytes())?.into_owned())?,
-                content_id: feed.id.split("/").collect::<Vec<&str>>()[2].to_string(),
+                content_id: feed.id.split('/').collect::<Vec<&str>>()[2].to_string(),
                 start_time: feed.published.unwrap().with_timezone(&Utc),
             })
         }

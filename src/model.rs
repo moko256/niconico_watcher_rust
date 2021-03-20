@@ -28,16 +28,11 @@ impl State {
         let last_state_time = self.latest_time;
         let data = repo.get_videos(&last_state_time).await;
 
-        if let Some(mut data) = data {
+        if let Some(data) = data {
             if !data.is_empty() {
                 let latest_time = data[0].start_time;
                 let mut movie_latest_time = Vec::new();
-                loop {
-                    let n = data.pop();
-                    if n.is_none() {
-                        break;
-                    }
-                    let n = n.unwrap();
+                for n in data.into_iter().rev() {
                     // Post when
                     // * New movies
                     // * Movies that should hit last request, but it wasn't contained and posted.
@@ -49,8 +44,10 @@ impl State {
                         movie_latest_time.push(n);
                     }
                 }
-                self.latest_time = latest_time;
-                self.movie_latest_time = movie_latest_time;
+                if !movie_latest_time.is_empty() {
+                    self.latest_time = latest_time;
+                    self.movie_latest_time = movie_latest_time;
+                }
             }
         }
     }
