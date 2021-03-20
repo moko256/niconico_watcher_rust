@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use chrono::DateTime;
 use chrono::Utc;
+use form_urlencoded::byte_serialize;
 use log::info;
 
 use crate::model::Repo;
@@ -9,16 +10,27 @@ use crate::req_nicovideo::ReqNicoVideo;
 use crate::vo::*;
 
 pub struct MainRepo {
-    pub nico: ReqNicoVideo,
-    pub discord: Option<ReqDiscord>,
-    pub query: String,
+    nico: ReqNicoVideo,
+    discord: Option<ReqDiscord>,
+    query_encodede: String,
 }
+
+impl MainRepo {
+    pub fn new(nico: ReqNicoVideo, discord: Option<ReqDiscord>, query: String) -> Self {
+        MainRepo {
+            nico,
+            discord,
+            query_encodede: byte_serialize(query.as_bytes()).collect(),
+        }
+    }
+}
+
 #[async_trait]
 impl Repo for MainRepo {
     async fn get_videos(&self, filter_time_latest_equal: &DateTime<Utc>) -> Option<Vec<NicoVideo>> {
         Some(
             self.nico
-                .search(&self.query, filter_time_latest_equal)
+                .search(&self.query_encodede, filter_time_latest_equal)
                 .await?
                 .data,
         )

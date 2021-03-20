@@ -33,11 +33,11 @@ async fn main() {
         warn!(target: "nicow", ".env: Running dry-run mode.");
     }
 
-    let mut repo: MainRepo = MainRepo {
-        nico: ReqNicoVideo::new(),
-        discord: ReqDiscord::try_new(&config).await,
-        query: config.keyword,
-    };
+    let mut repo: MainRepo = MainRepo::new(
+        ReqNicoVideo::new(),
+        ReqDiscord::try_new(&config).await,
+        config.keyword,
+    );
 
     let init_time: DateTime<Utc> = Utc::now();
     //DateTime::parse_from_rfc3339("2020-09-28T00:00:00Z").unwrap().with_timezone(&Utc);
