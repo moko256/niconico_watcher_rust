@@ -45,7 +45,7 @@ async fn main() {
 
     info!(target: "nicow", "main: Ready.");
     for nt in Schedule::from_str(&config.cron).unwrap().upcoming(Utc) {
-        time::wait_until(nt.with_timezone(&Utc)).await;
+        time::wait_until(nt).await;
 
         state.next_state(&mut repo).await;
     }

@@ -66,8 +66,8 @@ impl ReqNicoVideo {
     }
 
     async fn request(&self, url: String) -> Result<NicoResult, Box<dyn Error>> {
-        let response = (&self.client).get(&url).send().await?;
-        let status = response.status().as_u16() as i64;
+        let response = self.client.get(&url).send().await?;
+        let status = response.status().as_u16();
         let feeds = Feed::read_from(response.bytes().await?.reader())?.entries;
 
         let mut videos = Vec::with_capacity(feeds.len());
@@ -75,7 +75,7 @@ impl ReqNicoVideo {
             videos.push(NicoVideo {
                 title: String::from_utf8(entity_unescape(feed.title.as_bytes())?.into_owned())?,
                 content_id: feed.id.split("/").collect::<Vec<&str>>()[2].to_string(),
-                start_time: feed.published.unwrap().with_timezone::<Utc>(&Utc),
+                start_time: feed.published.unwrap().with_timezone(&Utc),
             })
         }
 

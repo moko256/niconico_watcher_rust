@@ -4,7 +4,7 @@ use chrono::Utc;
 // Value Objects
 
 pub struct NicoMeta {
-    pub status: i64,
+    pub status: u16,
 }
 
 pub struct NicoVideo {
