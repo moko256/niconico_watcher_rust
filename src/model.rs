@@ -44,10 +44,8 @@ impl State {
                         movie_latest_time.push(n);
                     }
                 }
-                if !movie_latest_time.is_empty() {
-                    self.latest_time = latest_time;
-                    self.movie_latest_time = movie_latest_time;
-                }
+                self.latest_time = latest_time;
+                self.movie_latest_time = movie_latest_time;
             }
         }
     }
