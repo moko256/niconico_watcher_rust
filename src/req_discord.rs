@@ -54,7 +54,7 @@ impl EventHandler for Handler {
 
 fn activity_watching() -> Activity {
     // I am very sad, but this is a necessary magic…
-    let mut s = Activity::listening("ニコニコ動画(Re)");
+    let mut s = Activity::listening("ニコニコ動画(𝚁𝚎)");
     let v = 3;
     unsafe {
         let vp = (&v as *const i32) as *const ActivityType;
