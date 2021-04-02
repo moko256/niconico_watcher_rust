@@ -10,8 +10,8 @@ use chrono::Utc;
 
 use bytes::buf::Buf;
 
-use atom_syndication::Feed;
 use quick_xml::escape::unescape as entity_unescape;
+use rss::Channel;
 
 use form_urlencoded::byte_serialize;
 
@@ -40,7 +40,7 @@ impl ReqNicoVideo {
     pub async fn search(&self, start_time_gte: &DateTime<Utc>) -> Option<NicoResult> {
         let r = self
             .request(format!(
-                "https://www.nicovideo.jp/tag/{}?rss=atom&sort=f&order=d&start={}",
+                "https://www.nicovideo.jp/tag/{}?rss=rss2&sort=f&order=d&start={}&nodescription=1&nothumbnail=1&noinfo=1",
                 self.query,
                 start_time_gte
                     .with_timezone(&*JST)
@@ -68,14 +68,25 @@ impl ReqNicoVideo {
     async fn request(&self, url: String) -> Result<NicoResult, Box<dyn Error>> {
         let response = self.client.get(&url).send().await?;
         let status = response.status().as_u16();
-        let feeds = Feed::read_from(response.bytes().await?.reader())?.entries;
+        let channels = Channel::read_from(response.bytes().await?.reader())?.items;
 
-        let mut videos = Vec::with_capacity(feeds.len());
-        for feed in feeds {
+        let mut videos = Vec::with_capacity(channels.len());
+        for channel in channels {
             videos.push(NicoVideo {
-                title: String::from_utf8(entity_unescape(feed.title.as_bytes())?.into_owned())?,
-                content_id: feed.id.split('/').collect::<Vec<&str>>()[2].to_string(),
-                start_time: feed.published.unwrap().with_timezone(&Utc),
+                title: String::from_utf8(
+                    entity_unescape(channel.title().unwrap().as_bytes())?.into_owned(),
+                )?,
+                content_id: channel
+                    .guid()
+                    .unwrap()
+                    .value
+                    .split('/')
+                    .next_back()
+                    .unwrap()
+                    .to_owned(),
+                start_time: DateTime::parse_from_rfc2822(channel.pub_date().unwrap())
+                    .unwrap()
+                    .with_timezone(&Utc),
             })
         }
 
