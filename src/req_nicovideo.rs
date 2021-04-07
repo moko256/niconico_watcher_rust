@@ -1,7 +1,7 @@
 use log::error;
 
 use once_cell::sync::Lazy;
-use reqwest::Client;
+use reqwest::{Client, Response};
 use std::error::Error;
 
 use chrono::offset::FixedOffset;
@@ -37,27 +37,10 @@ impl ReqNicoVideo {
         ReqNicoVideo { client, query }
     }
 
-    pub async fn search(&self, start_time_gte: &DateTime<Utc>) -> Option<NicoResult> {
-        let r = self
-            .request(format!(
-                "https://www.nicovideo.jp/tag/{}?rss=rss2&sort=f&order=d&start={}&nodescription=1&nothumbnail=1&noinfo=1",
-                self.query,
-                start_time_gte
-                    .with_timezone(&*JST)
-                    .format("%Y-%m-%d")
-                    .to_string(),
-            ))
-            .await;
-        match r {
-            Ok(v) => {
-                let status_code = v.meta.status;
-                if status_code == 200 {
-                    Some(v)
-                } else {
-                    error!(target: "nicow", "HTTP: Status {} != 200", status_code);
-                    None
-                }
-            }
+    pub async fn search(&self, start_time: &DateTime<Utc>) -> Option<Vec<NicoVideo>> {
+        let result = self.search_err(start_time).await;
+        match result {
+            Ok(video) => Some(video),
             Err(e) => {
                 error!(target: "nicow", "HTTP: {}", e);
                 None
@@ -65,9 +48,32 @@ impl ReqNicoVideo {
         }
     }
 
-    async fn request(&self, url: String) -> Result<NicoResult, Box<dyn Error>> {
-        let response = self.client.get(&url).send().await?;
-        let status = response.status().as_u16();
+    async fn search_err(
+        &self,
+        start_time: &DateTime<Utc>,
+    ) -> Result<Vec<NicoVideo>, Box<dyn Error>> {
+        let response = self.request(start_time).await?;
+        let response = if response.status() == 200 || response.status() == 404 {
+            response
+        } else {
+            response.error_for_status()?
+        };
+        self.parse(response).await
+    }
+
+    async fn request(&self, start_time_gte: &DateTime<Utc>) -> Result<Response, Box<dyn Error>> {
+        let url = format!(
+            "https://www.nicovideo.jp/tag/{}?rss=rss2&sort=f&order=d&start={}&nodescription=1&nothumbnail=1&noinfo=1",
+            self.query,
+            start_time_gte
+                .with_timezone(&*JST)
+                .format("%Y-%m-%d")
+                .to_string(),
+        );
+        self.client.get(&url).send().await.map_err(|e| Box::from(e))
+    }
+
+    async fn parse(&self, response: Response) -> Result<Vec<NicoVideo>, Box<dyn Error>> {
         let channels = Channel::read_from(response.bytes().await?.reader())?.items;
 
         let mut videos = Vec::with_capacity(channels.len());
@@ -90,9 +96,6 @@ impl ReqNicoVideo {
             })
         }
 
-        Ok(NicoResult {
-            data: videos,
-            meta: NicoMeta { status },
-        })
+        Ok(videos)
     }
 }
