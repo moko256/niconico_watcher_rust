@@ -14,7 +14,7 @@ use crate::config::Config;
 
 pub struct ReqDiscord {
     http: Arc<Http>,
-    ch: ChannelId,
+    ch: Vec<ChannelId>,
 }
 
 impl ReqDiscord {
@@ -31,7 +31,7 @@ impl ReqDiscord {
                 client.start().await.unwrap();
             });
 
-            let ch = ChannelId(config.chid.parse().unwrap());
+            let ch = config.chid.iter().map(|id| ChannelId(*id)).collect();
             Some(ReqDiscord { http, ch })
         } else {
             None
@@ -39,7 +39,9 @@ impl ReqDiscord {
     }
 
     pub async fn post(&mut self, msg: String) {
-        self.ch.say(Arc::clone(&self.http), msg).await.unwrap();
+        for ch in self.ch.iter() {
+            ch.say(Arc::clone(&self.http), &msg).await.unwrap();
+        }
     }
 }
 

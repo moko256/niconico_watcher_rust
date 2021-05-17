@@ -23,7 +23,7 @@ pub fn get_conf(
     Config {
         token: token.unwrap(),
         keyword: keyword.unwrap(),
-        chid: chid.unwrap(),
+        chid: chid.unwrap().split(",").map(|id| id.parse::<u64>().unwrap()).collect(),
         dryrun: bool::from_str(&dryrun.unwrap()).unwrap(),
         cron: cron.unwrap(),
     }
@@ -33,7 +33,7 @@ pub fn get_conf(
 pub struct Config {
     pub token: String,
     pub keyword: String,
-    pub chid: String,
+    pub chid: Vec<u64>,
     pub dryrun: bool,
     pub cron: String,
 }
