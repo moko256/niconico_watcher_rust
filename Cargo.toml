@@ -14,7 +14,7 @@ panic = "abort"
 
 
 [dependencies]
-async-trait = "0.1.48"
+async-trait = "0.1.50"
 bytes = "1.0.1"
 chrono = "0.4.19"
 cron = "0.8.0"
@@ -29,7 +29,7 @@ version = "1.10.0"
 default-features = false
 
 [dependencies.tokio]
-version = "1.5.0"
+version = "1.6.0"
 default-features = false
 features = [
     "macros",
