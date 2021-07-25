@@ -2,6 +2,7 @@ use log::error;
 
 use once_cell::sync::Lazy;
 use reqwest::{Client, Response};
+use std::borrow::Cow;
 use std::error::Error;
 
 use chrono::offset::FixedOffset;
@@ -78,9 +79,10 @@ impl ReqNicoVideo {
 
         let mut videos = Vec::with_capacity(channels.len());
         for channel in channels {
+            let title = channel.title().unwrap().as_bytes();
             videos.push(NicoVideo {
                 title: String::from_utf8(
-                    entity_unescape(channel.title().unwrap().as_bytes())?.into_owned(),
+                    entity_unescape(title).unwrap_or(Cow::Borrowed(title)).into_owned(),
                 )?,
                 content_id: channel
                     .guid()
