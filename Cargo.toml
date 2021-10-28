@@ -30,7 +30,7 @@ form_urlencoded = "1"
 quick-xml = "0.22"
 
 [dependencies.rss]
-version = "1"
+version = "2"
 default-features = false
 
 [dependencies.tokio]
