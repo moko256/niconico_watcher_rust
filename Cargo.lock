@@ -631,7 +631,6 @@ dependencies = [
  "dotenv",
  "form_urlencoded",
  "log",
- "once_cell",
  "quick-xml",
  "reqwest",
  "rss",
