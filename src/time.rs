@@ -16,3 +16,23 @@ pub async fn wait_until(when: DateTime<Utc>) {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use chrono::{Duration, Utc};
+    use tokio::runtime::Builder;
+
+    use super::*;
+
+    #[test]
+    fn time_test() {
+        let rt = Builder::new_current_thread().enable_time().build().unwrap();
+        rt.block_on(async {
+            //Not panic normally.
+            wait_until(Utc::now() + Duration::seconds(1)).await;
+
+            //Not panic though `when` is older than now.
+            wait_until(Utc::now() - Duration::seconds(10)).await;
+        });
+    }
+}

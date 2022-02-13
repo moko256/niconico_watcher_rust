@@ -5,8 +5,6 @@ use cron::Schedule;
 use log::info;
 use log::warn;
 
-mod tests;
-
 mod app_logger;
 mod config;
 mod main_repo;
