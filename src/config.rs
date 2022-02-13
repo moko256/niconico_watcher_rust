@@ -1,15 +1,15 @@
 use dotenv::dotenv;
-use std::str::FromStr;
+use std::{env, str::FromStr};
 
 pub fn load_conf() -> Config {
     dotenv().ok();
 
     get_conf(
-        dotenv::var("TOKEN").ok(),
-        dotenv::var("CHID").ok(),
-        dotenv::var("KEYWORD").ok(),
-        dotenv::var("CRON").ok(),
-        dotenv::var("DRYRUN").ok(),
+        env::var("TOKEN").ok(),
+        env::var("CHID").ok(),
+        env::var("KEYWORD").ok(),
+        env::var("CRON").ok(),
+        env::var("DRYRUN").ok(),
     )
 }
 
