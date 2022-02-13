@@ -1,6 +1,4 @@
 use async_trait::async_trait;
-use chrono::DateTime;
-use chrono::Utc;
 use log::info;
 
 use crate::model::Repo;
@@ -15,8 +13,8 @@ pub struct MainRepo {
 
 #[async_trait]
 impl Repo for MainRepo {
-    async fn get_videos(&self, filter_time_latest_equal: &DateTime<Utc>) -> Option<Vec<NicoVideo>> {
-        Some(self.nico.search(filter_time_latest_equal).await?)
+    async fn get_videos(&self) -> Option<Vec<NicoVideo>> {
+        Some(self.nico.search().await?)
     }
 
     async fn post_message(&mut self, message: &NicoVideo) {

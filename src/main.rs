@@ -1,6 +1,5 @@
 use std::str::FromStr;
 
-use chrono::DateTime;
 use chrono::Utc;
 use cron::Schedule;
 use log::info;
@@ -38,12 +37,12 @@ async fn main() {
         discord: ReqDiscord::try_new(&config).await,
     };
 
-    let init_time: DateTime<Utc> = Utc::now();
-    //DateTime::parse_from_rfc3339("2020-09-28T00:00:00Z").unwrap().with_timezone(&Utc);
-
-    let mut state = State::new(init_time);
+    let mut state = State::Unretrieved;
 
     info!(target: "nicow", "main: Ready.");
+
+    state.next_state(&mut repo).await;
+
     for nt in Schedule::from_str(&config.cron).unwrap().upcoming(Utc) {
         time::wait_until(nt).await;
 

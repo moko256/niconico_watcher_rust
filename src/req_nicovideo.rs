@@ -1,11 +1,9 @@
 use log::error;
 
-use once_cell::sync::Lazy;
 use reqwest::{Client, Response};
 use std::borrow::Cow;
 use std::error::Error;
 
-use chrono::offset::FixedOffset;
 use chrono::DateTime;
 use chrono::Utc;
 
@@ -18,8 +16,6 @@ use form_urlencoded::byte_serialize;
 
 use crate::config::Config;
 use crate::vo::*;
-
-static JST: Lazy<FixedOffset> = Lazy::new(|| FixedOffset::east(9 * 3600));
 
 pub struct ReqNicoVideo {
     client: Client,
@@ -38,8 +34,8 @@ impl ReqNicoVideo {
         ReqNicoVideo { client, query }
     }
 
-    pub async fn search(&self, start_time: &DateTime<Utc>) -> Option<Vec<NicoVideo>> {
-        let result = self.search_err(start_time).await;
+    pub async fn search(&self) -> Option<Vec<NicoVideo>> {
+        let result = self.search_err().await;
         match result {
             Ok(video) => Some(video),
             Err(e) => {
@@ -49,11 +45,8 @@ impl ReqNicoVideo {
         }
     }
 
-    async fn search_err(
-        &self,
-        start_time: &DateTime<Utc>,
-    ) -> Result<Vec<NicoVideo>, Box<dyn Error>> {
-        let response = self.request(start_time).await?;
+    async fn search_err(&self) -> Result<Vec<NicoVideo>, Box<dyn Error>> {
+        let response = self.request().await?;
         let response = if response.status() == 200 || response.status() == 404 {
             response
         } else {
@@ -62,14 +55,10 @@ impl ReqNicoVideo {
         self.parse(response).await
     }
 
-    async fn request(&self, start_time_gte: &DateTime<Utc>) -> Result<Response, Box<dyn Error>> {
+    async fn request(&self) -> Result<Response, Box<dyn Error>> {
         let url = format!(
-            "https://www.nicovideo.jp/tag/{}?rss=rss2&sort=f&order=d&start={}&nodescription=1&nothumbnail=1&noinfo=1",
+            "https://www.nicovideo.jp/tag/{}?rss=rss2&sort=f&order=d&nodescription=1&nothumbnail=1&noinfo=1",
             self.query,
-            start_time_gte
-                .with_timezone(&*JST)
-                .format("%Y-%m-%d")
-                .to_string(),
         );
         self.client.get(&url).send().await.map_err(|e| Box::from(e))
     }
@@ -82,7 +71,9 @@ impl ReqNicoVideo {
             let title = channel.title().unwrap().as_bytes();
             videos.push(NicoVideo {
                 title: String::from_utf8(
-                    entity_unescape(title).unwrap_or(Cow::Borrowed(title)).into_owned(),
+                    entity_unescape(title)
+                        .unwrap_or(Cow::Borrowed(title))
+                        .into_owned(),
                 )?,
                 content_id: channel
                     .guid()
