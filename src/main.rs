@@ -41,7 +41,7 @@ async fn main() {
 
     state.next_state(&mut repo).await;
 
-    for nt in Schedule::from_str(&config.cron).unwrap().upcoming(Utc) {
+    for nt in Schedule::from_str(&config.cron).unwrap().after(&Utc::now()) {
         time::wait_until(nt).await;
 
         state.next_state(&mut repo).await;
