@@ -8,14 +8,16 @@ pub enum State {
 }
 
 impl State {
-    fn movie_not_contains_in_prev(n: &NicoVideo, previous: &Vec<NicoVideo>) -> bool {
-        return !previous.iter().any(|p| n.content_id == p.content_id);
+    fn movie_not_contains_in_prev(target: &NicoVideo, previous: &Vec<NicoVideo>) -> bool {
+        return !previous
+            .iter()
+            .any(|prev_any| target.content_id == prev_any.content_id);
     }
 
-    fn movie_newer_than_oldest_prev(n: &NicoVideo, previous: &Vec<NicoVideo>) -> bool {
+    fn movie_newer_than_oldest_prev(target: &NicoVideo, previous: &Vec<NicoVideo>) -> bool {
         let prev_most_old = previous.last();
-        return prev_most_old.map_or(true, |next_most_old| {
-            n.start_time > next_most_old.start_time
+        return prev_most_old.map_or(true, |prev_most_old| {
+            target.start_time > prev_most_old.start_time
         });
     }
 
