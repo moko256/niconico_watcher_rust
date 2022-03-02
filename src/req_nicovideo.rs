@@ -60,7 +60,7 @@ impl ReqNicoVideo {
             "https://www.nicovideo.jp/tag/{}?rss=rss2&sort=f&order=d&nodescription=1&nothumbnail=1&noinfo=1",
             self.query,
         );
-        self.client.get(&url).send().await.map_err(|e| Box::from(e))
+        Ok(self.client.get(&url).send().await?)
     }
 
     async fn parse(&self, response: Response) -> Result<Vec<NicoVideo>, Box<dyn Error>> {

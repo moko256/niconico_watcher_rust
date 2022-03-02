@@ -15,8 +15,7 @@ impl AppLogger {
 
     pub fn init() -> Result<(), SetLoggerError> {
         set_max_level(LevelFilter::Info);
-        set_logger(&APP_LOGGER)?;
-        Ok(())
+        set_logger(&APP_LOGGER)
     }
 }
 impl Log for AppLogger {
