@@ -27,7 +27,7 @@ impl Log for AppLogger {
     fn log(&self, record: &Record) {
         if self.enabled(record.metadata()) {
             println!(
-                "<{}>{} - {}",
+                "<{}>{}: {}",
                 AppLogger::level_to_severity_rfc5424(record.level()),
                 record.target(),
                 record.args()
