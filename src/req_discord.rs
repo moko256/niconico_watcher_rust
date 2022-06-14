@@ -19,7 +19,7 @@ pub struct ReqDiscord {
 impl ReqDiscord {
     pub async fn try_new(config: &Config) -> Option<ReqDiscord> {
         if !config.dryrun {
-            let mut client = Client::builder(&config.token)
+            let mut client = Client::builder(&config.token, Default::default())
                 .event_handler(Handler)
                 .await
                 .unwrap();
