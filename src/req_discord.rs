@@ -20,7 +20,9 @@ impl ReqDiscord {
     pub async fn try_new(config: &Config) -> Option<ReqDiscord> {
         if !config.dryrun {
             let mut client = Client::builder(&config.token, Default::default())
-                .event_handler(Handler)
+                .event_handler(Handler {
+                    bot_watching_target: config.bot_watching_target.clone(),
+                })
                 .await
                 .unwrap();
 
@@ -44,11 +46,13 @@ impl ReqDiscord {
     }
 }
 
-struct Handler;
+struct Handler {
+    bot_watching_target: String,
+}
 #[async_trait]
 impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, _data_about_bot: Ready) {
-        ctx.set_activity(Activity::watching("ニコニコ動画(𝚁𝚎)"))
+        ctx.set_activity(Activity::watching(&self.bot_watching_target))
             .await;
         info!(target: "nicow", "Discord: Set status.");
     }
