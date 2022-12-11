@@ -1,4 +1,4 @@
-use dotenv::dotenv;
+use dotenvy::dotenv;
 use std::{env, str::FromStr};
 
 pub fn load_conf() -> Config {
