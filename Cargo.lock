@@ -600,7 +600,7 @@ dependencies = [
  "dotenvy",
  "form_urlencoded",
  "log",
- "quick-xml 0.23.0",
+ "quick-xml",
  "reqwest",
  "rss",
  "serenity",
@@ -755,15 +755,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "quick-xml"
-version = "0.23.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9279fbdacaad3baf559d8cabe0acc3d06e30ea14931af31af79578ac0946decc"
-dependencies = [
- "memchr",
-]
-
-[[package]]
 name = "quote"
 version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -886,7 +877,7 @@ version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "acaf1331b7fc4edc3c2920819fee1766c27e8d40da593155832db3d6dea64e92"
 dependencies = [
- "quick-xml 0.22.0",
+ "quick-xml",
 ]
 
 [[package]]
