@@ -27,7 +27,7 @@ pub fn get_conf(
         keyword: keyword.unwrap(),
         chid: chid
             .unwrap()
-            .split(",")
+            .split(',')
             .map(|id| id.parse::<u64>().unwrap())
             .collect(),
         dryrun: bool::from_str(&dryrun.unwrap()).unwrap(),
@@ -36,7 +36,7 @@ pub fn get_conf(
     }
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Eq, Debug)]
 pub struct Config {
     pub token: String,
     pub keyword: String,

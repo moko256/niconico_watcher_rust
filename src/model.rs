@@ -8,22 +8,22 @@ pub enum State {
 }
 
 impl State {
-    fn movie_not_contains_in_prev(target: &NicoVideo, previous: &Vec<NicoVideo>) -> bool {
+    fn movie_not_contains_in_prev(target: &NicoVideo, previous: &[NicoVideo]) -> bool {
         return !previous
             .iter()
             .any(|prev_any| target.content_id == prev_any.content_id);
     }
 
-    fn movie_newer_than_oldest_prev(target: &NicoVideo, previous: &Vec<NicoVideo>) -> bool {
+    fn movie_newer_than_oldest_prev(target: &NicoVideo, previous: &[NicoVideo]) -> bool {
         let prev_most_old = previous.last();
-        return prev_most_old.map_or(true, |prev_most_old| {
+        prev_most_old.map_or(true, |prev_most_old| {
             target.start_time > prev_most_old.start_time
-        });
+        })
     }
 
-    fn movie_postable(target: &NicoVideo, previous: &Vec<NicoVideo>) -> bool {
-        return State::movie_not_contains_in_prev(target, previous)
-            && State::movie_newer_than_oldest_prev(target, previous);
+    fn movie_postable(target: &NicoVideo, previous: &[NicoVideo]) -> bool {
+        State::movie_not_contains_in_prev(target, previous)
+            && State::movie_newer_than_oldest_prev(target, previous)
     }
 
     // Note: this algorithm does not consider when getVideos().len() > api query limit
@@ -66,17 +66,17 @@ mod tests {
         let newer = test_datum.pop().unwrap();
         let n = test_datum.pop().unwrap();
         let older = test_datum.pop().unwrap();
-        return (older, n, newer);
+        (older, n, newer)
     }
 
     fn test_data(i: i32) -> NicoVideo {
-        return NicoVideo {
+        NicoVideo {
             title: String::new(),
             content_id: format!("sm{}", i),
             start_time: DateTime::parse_from_rfc3339(&format!("2022-02-1{}T00:00:00Z", i + 3))
                 .unwrap()
                 .with_timezone(&Utc),
-        };
+        }
     }
 
     #[test]
@@ -85,14 +85,14 @@ mod tests {
         let (_, n, _) = test_datum();
         let contains = false;
         let not_contains = true;
-        assert_eq!(State::movie_not_contains_in_prev(&n, &vec![]), not_contains);
+        assert_eq!(State::movie_not_contains_in_prev(&n, &[]), not_contains);
         assert_eq!(
-            State::movie_not_contains_in_prev(&n, &vec![older]),
+            State::movie_not_contains_in_prev(&n, &[older]),
             not_contains
         );
-        assert_eq!(State::movie_not_contains_in_prev(&n, &vec![nb]), contains);
+        assert_eq!(State::movie_not_contains_in_prev(&n, &[nb]), contains);
         assert_eq!(
-            State::movie_not_contains_in_prev(&n, &vec![newer]),
+            State::movie_not_contains_in_prev(&n, &[newer]),
             not_contains
         );
     }
@@ -103,10 +103,10 @@ mod tests {
         let (_, n, _) = test_datum();
         let old = false;
         let new = true;
-        assert_eq!(State::movie_newer_than_oldest_prev(&n, &vec![]), new);
-        assert_eq!(State::movie_newer_than_oldest_prev(&n, &vec![older]), new);
-        assert_eq!(State::movie_newer_than_oldest_prev(&n, &vec![nb]), old);
-        assert_eq!(State::movie_newer_than_oldest_prev(&n, &vec![newer]), old);
+        assert_eq!(State::movie_newer_than_oldest_prev(&n, &[]), new);
+        assert_eq!(State::movie_newer_than_oldest_prev(&n, &[older]), new);
+        assert_eq!(State::movie_newer_than_oldest_prev(&n, &[nb]), old);
+        assert_eq!(State::movie_newer_than_oldest_prev(&n, &[newer]), old);
     }
 
     #[test]
