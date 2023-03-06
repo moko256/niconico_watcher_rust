@@ -26,7 +26,7 @@ cron = "0.12"
 dotenvy = "0.15"
 log = { version = "0.4", features = ["max_level_info"]}
 form_urlencoded = "1"
-quick-xml = "0.22" # Using the version thar the `rss` crate uses.
+quick-xml = "0.27" # Using the version thar the `rss` crate uses.
 
 [dependencies.chrono]
 version = "0.4"
@@ -37,7 +37,7 @@ features = [
 ]
 
 [dependencies.rss]
-version = "2"
+version = "= 2.0.2"
 default-features = false
 
 [dependencies.tokio]

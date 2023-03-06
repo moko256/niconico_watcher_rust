@@ -1,8 +1,10 @@
 use log::error;
 
 use reqwest::{Client, Response};
+use std::borrow::Borrow;
 use std::borrow::Cow;
 use std::error::Error;
+use std::str::FromStr;
 
 use chrono::DateTime;
 use chrono::Utc;
@@ -68,12 +70,12 @@ impl ReqNicoVideo {
 
         let mut videos = Vec::with_capacity(channels.len());
         for channel in channels {
-            let title = channel.title().unwrap().as_bytes();
+            let title = channel.title().unwrap();
             videos.push(NicoVideo {
-                title: String::from_utf8(
+                title: String::from_str(
                     entity_unescape(title)
                         .unwrap_or(Cow::Borrowed(title))
-                        .into_owned(),
+                        .borrow(),
                 )?,
                 content_id: channel
                     .guid()
