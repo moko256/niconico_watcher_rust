@@ -9,7 +9,7 @@ use serenity::model::id::ChannelId;
 use serenity::Client;
 use std::sync::Arc;
 
-use crate::config::Config;
+use crate::config::DiscordConfig;
 
 pub struct ReqDiscord {
     http: Arc<Http>,
@@ -17,26 +17,23 @@ pub struct ReqDiscord {
 }
 
 impl ReqDiscord {
-    pub async fn try_new(config: &Config) -> Option<ReqDiscord> {
-        if !config.dryrun {
-            let mut client = Client::builder(&config.token, Default::default())
-                .event_handler(Handler {
-                    bot_watching_target: config.bot_watching_target.clone(),
-                })
-                .await
-                .unwrap();
+    pub async fn new(config: &DiscordConfig) -> ReqDiscord {
+        let mut client = Client::builder(&config.token, Default::default())
+            .event_handler(Handler {
+                bot_watching_target: config.bot_watching_target.clone(),
+            })
+            .await
+            .unwrap();
 
-            let http = Arc::clone(&client.cache_and_http.http);
+        let http = Arc::clone(&client.cache_and_http.http);
 
-            tokio::spawn(async move {
-                client.start().await.unwrap();
-            });
+        tokio::spawn(async move {
+            client.start().await.unwrap();
+        });
 
-            let ch = config.chid.iter().map(|id| ChannelId(*id)).collect();
-            Some(ReqDiscord { http, ch })
-        } else {
-            None
-        }
+        let ch = config.chid.iter().map(|id| ChannelId(*id)).collect();
+
+        ReqDiscord { http, ch }
     }
 
     pub async fn post(&mut self, msg: String) {

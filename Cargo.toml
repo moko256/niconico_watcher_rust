@@ -23,7 +23,8 @@ rustls_backend = ["reqwest/rustls-tls", "serenity/rustls_backend"]
 async-trait = "0.1"
 bytes = "1"
 cron = "0.12"
-dotenvy = "0.15"
+serde = { version = "1.0.166", features = ["derive"]}
+toml = "0.7.5"
 log = { version = "0.4", features = ["max_level_info"]}
 form_urlencoded = "1"
 quick-xml = "0.27" # Using the version thar the `rss` crate uses.

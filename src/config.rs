@@ -1,49 +1,56 @@
-use dotenvy::dotenv;
-use std::{env, str::FromStr};
+use std::fs::read_to_string;
+
+use log::info;
+use serde::Deserialize;
 
 pub fn load_conf() -> Config {
-    dotenv().ok();
+    let raw_config = read_to_string("config.toml");
+    match raw_config {
+        Ok(raw_config) => {
+            let config = get_conf(&raw_config);
 
-    get_conf(
-        env::var("TOKEN").ok(),
-        env::var("CHID").ok(),
-        env::var("KEYWORD").ok(),
-        env::var("CRON").ok(),
-        env::var("DRYRUN").ok(),
-        env::var("BOT_WATCHING_TARGET").ok(),
-    )
-}
+            info!(target: "nicow", "Parsing `config.toml` was successful!");
 
-pub fn get_conf(
-    token: Option<String>,
-    chid: Option<String>,
-    keyword: Option<String>,
-    cron: Option<String>,
-    dryrun: Option<String>,
-    bot_watching_target: Option<String>,
-) -> Config {
-    Config {
-        token: token.unwrap(),
-        keyword: keyword.unwrap(),
-        chid: chid
-            .unwrap()
-            .split(',')
-            .map(|id| id.parse::<u64>().unwrap())
-            .collect(),
-        dryrun: bool::from_str(&dryrun.unwrap()).unwrap(),
-        cron: cron.unwrap(),
-        bot_watching_target: bot_watching_target.unwrap(),
+            return config;
+        }
+        Err(err) => {
+            panic!("Failed to read `config.toml`: {}", err);
+        }
     }
 }
 
-#[derive(PartialEq, Eq, Debug)]
+pub fn get_conf(content: &str) -> Config {
+    let config = toml::from_str::<Config>(content);
+    match config {
+        Ok(config) => {
+            return config;
+        }
+        Err(err) => {
+            panic!("Failed to parse toml: {}", err);
+        }
+    }
+}
+
+#[derive(PartialEq, Eq, Debug, Deserialize)]
 pub struct Config {
-    pub token: String,
     pub keyword: String,
-    pub chid: Vec<u64>,
     pub dryrun: bool,
     pub cron: String,
+
+    pub discord: Option<DiscordConfig>,
+    pub misskey: Option<MisskeyConfig>,
+}
+
+#[derive(PartialEq, Eq, Debug, Deserialize)]
+pub struct DiscordConfig {
+    pub token: String,
+    pub chid: Vec<u64>,
     pub bot_watching_target: String,
+}
+
+#[derive(PartialEq, Eq, Debug, Deserialize)]
+pub struct MisskeyConfig {
+    pub tokens: Vec<String>,
 }
 
 #[cfg(test)]
@@ -51,102 +58,43 @@ mod tests {
     use super::*;
 
     #[test]
-    fn valid_config() {
+    fn valid_config_all() {
         assert_eq!(
             get_conf(
-                Some("token".to_string()),
-                Some("1234".to_string()),
-                Some("keyword".to_string()),
-                Some("cron".to_string()),
-                Some("true".to_string()),
-                Some("bot_watching_target".to_string()),
+                r#"
+                keyword = "keyword"
+                dryrun = true
+                cron = "cron"
+
+                [discord]
+                token = "token"
+                chid = [12,34]
+                bot_watching_target = "bot_watching_target"
+
+                [misskey]
+                tokens = ["t1","t2"]
+                "#,
             ),
             Config {
-                token: "token".to_string(),
-                chid: vec![1234],
                 keyword: "keyword".to_string(),
-                cron: "cron".to_string(),
                 dryrun: true,
-                bot_watching_target: "bot_watching_target".to_string(),
+                cron: "cron".to_string(),
+
+                discord: Some(DiscordConfig {
+                    token: "token".to_string(),
+                    chid: vec![12, 34],
+                    bot_watching_target: "bot_watching_target".to_string(),
+                }),
+                misskey: Some(MisskeyConfig {
+                    tokens: vec!["t1".to_string(), "t2".to_string()]
+                })
             }
         );
     }
 
     #[test]
     #[should_panic]
-    fn token_null() {
-        get_conf(
-            None,
-            Some("chid".to_string()),
-            Some("keyword".to_string()),
-            Some("cron".to_string()),
-            Some("true".to_string()),
-            Some("bot_watching_target".to_string()),
-        );
-    }
-
-    #[test]
-    #[should_panic]
-    fn chid_null() {
-        get_conf(
-            Some("token".to_string()),
-            None,
-            Some("keyword".to_string()),
-            Some("cron".to_string()),
-            Some("true".to_string()),
-            Some("bot_watching_target".to_string()),
-        );
-    }
-
-    #[test]
-    #[should_panic]
-    fn keyword_null() {
-        get_conf(
-            Some("token".to_string()),
-            Some("chid".to_string()),
-            None,
-            Some("cron".to_string()),
-            Some("true".to_string()),
-            Some("bot_watching_target".to_string()),
-        );
-    }
-
-    #[test]
-    #[should_panic]
-    fn cron_null() {
-        get_conf(
-            Some("token".to_string()),
-            Some("chid".to_string()),
-            Some("keyword".to_string()),
-            None,
-            Some("true".to_string()),
-            Some("bot_watching_target".to_string()),
-        );
-    }
-
-    #[test]
-    #[should_panic]
-    fn dryrun_null() {
-        get_conf(
-            Some("token".to_string()),
-            Some("chid".to_string()),
-            Some("keyword".to_string()),
-            Some("cron".to_string()),
-            None,
-            Some("bot_watching_target".to_string()),
-        );
-    }
-
-    #[test]
-    #[should_panic]
-    fn bot_watching_target_null() {
-        get_conf(
-            Some("token".to_string()),
-            Some("chid".to_string()),
-            Some("keyword".to_string()),
-            Some("cron".to_string()),
-            Some("true".to_string()),
-            None,
-        );
+    fn invalid_nothing_all() {
+        get_conf("");
     }
 }

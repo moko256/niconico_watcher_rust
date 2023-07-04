@@ -1,0 +1,11 @@
+keyword = "keyword"
+dryrun = true
+cron = "25 0/1 * * * *"
+
+[discord]
+token = "discord-app-token"
+chid = [0] #discord-chid
+bot_watching_target = "ニコニコ動画"
+
+[misskey]
+tokens = ["misskey-token"]

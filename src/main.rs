@@ -30,9 +30,21 @@ async fn main() {
         warn!(target: "nicow", ".env: Running dry-run mode.");
     }
 
+    let discord_repo = if !config.dryrun {
+        let discord_repo = if let Some(config) = &config.discord {
+            Some(ReqDiscord::new(&config).await)
+        } else {
+            None
+        };
+
+        discord_repo
+    } else {
+        None
+    };
+
     let mut repo: MainRepo = MainRepo {
         nico: ReqNicoVideo::new(&config),
-        discord: ReqDiscord::try_new(&config).await,
+        discord: discord_repo,
     };
 
     let mut state = State::Unretrieved;
