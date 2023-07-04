@@ -48,8 +48,6 @@ impl ReqMisskey {
             text: msg,
             local_only: true,
             no_extract_mentions: true,
-            no_extract_hashtags: true,
-            no_extract_emojis: true,
         };
 
         let result = self.client.post(&url).json(&request_body).send().await?;
@@ -67,6 +65,4 @@ struct RequestBodyCreateNote {
     text: String,
     local_only: bool,
     no_extract_mentions: bool,
-    no_extract_hashtags: bool,
-    no_extract_emojis: bool,
 }
