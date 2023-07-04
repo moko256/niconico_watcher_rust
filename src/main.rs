@@ -30,7 +30,7 @@ async fn main() {
 
     let config = load_conf();
     if config.dryrun {
-        warn!(target: "nicow", ".env: Running dry-run mode.");
+        warn!(target: "nicow", "main: Running dry-run mode.");
     }
 
     // Create dest repositories.

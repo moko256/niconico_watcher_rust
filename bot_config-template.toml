@@ -2,11 +2,15 @@ keyword = "keyword"
 dryrun = true
 cron = "25 0/1 * * * *"
 
+# Optional
+# If you don't need this, remove this section.
 [discord]
 token = "discord-app-token"
 chid = [0] #discord-chid
 bot_watching_target = "ニコニコ動画"
 
+# Optional
+# If you don't need this, remove this section.
 [misskey]
 server_domain = "example.com"
 token = "misskey-token"
