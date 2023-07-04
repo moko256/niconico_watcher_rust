@@ -3,12 +3,14 @@ use log::info;
 
 use crate::model::Repo;
 use crate::req_discord::ReqDiscord;
+use crate::req_misskey::ReqMisskey;
 use crate::req_nicovideo::ReqNicoVideo;
 use crate::vo::*;
 
 pub struct MainRepo {
     pub nico: ReqNicoVideo,
     pub discord: Option<ReqDiscord>,
+    pub misskey: Option<ReqMisskey>,
 }
 
 #[async_trait]
@@ -21,15 +23,20 @@ impl Repo for MainRepo {
         // New movie: sm000 "title"
         info!(target: "nicow", "New Movie: {} \"{}\"", message.content_id, message.title);
 
-        if let Some(discord) = &mut self.discord {
-            //【新着動画】title
-            //ttps://nico.ms/sm000
-            discord
-                .post(format!(
-                    "**【新着動画】**{}\nhttps://nico.ms/{}",
-                    message.title, message.content_id
-                ))
-                .await;
-        }
+        // Post functions.
+        let handle_discord = async {
+            if let Some(discord) = &mut self.discord {
+                discord.post(&message).await;
+            }
+        };
+
+        let handle_misskey = async {
+            if let Some(misskey) = &mut self.misskey {
+                misskey.post(&message).await;
+            }
+        };
+
+        // Wait posting.
+        tokio::join!(handle_discord, handle_misskey);
     }
 }

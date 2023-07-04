@@ -10,6 +10,7 @@ use serenity::Client;
 use std::sync::Arc;
 
 use crate::config::DiscordConfig;
+use crate::vo::NicoVideo;
 
 pub struct ReqDiscord {
     http: Arc<Http>,
@@ -17,7 +18,7 @@ pub struct ReqDiscord {
 }
 
 impl ReqDiscord {
-    pub async fn new(config: &DiscordConfig) -> ReqDiscord {
+    pub async fn new_async(config: &DiscordConfig) -> ReqDiscord {
         let mut client = Client::builder(&config.token, Default::default())
             .event_handler(Handler {
                 bot_watching_target: config.bot_watching_target.clone(),
@@ -36,9 +37,24 @@ impl ReqDiscord {
         ReqDiscord { http, ch }
     }
 
-    pub async fn post(&mut self, msg: String) {
+    pub async fn post(&mut self, video: &NicoVideo) {
+        //【新着動画】title
+        //ttps://nico.ms/sm000
+        let msg = format!(
+            "**【新着動画】**{}\nhttps://nico.ms/{}",
+            video.title, video.content_id
+        );
         for ch in self.ch.iter() {
-            ch.say(Arc::clone(&self.http), &msg).await.unwrap();
+            let result = ch.say(Arc::clone(&self.http), &msg).await;
+
+            if let Err(err) = result {
+                log::error!(
+                    "Failed to post `https://nico.ms/{}` to Discord (chid: {}): {}",
+                    video.content_id,
+                    ch,
+                    err
+                );
+            }
         }
     }
 }

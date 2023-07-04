@@ -10,6 +10,7 @@ mod config;
 mod main_repo;
 mod model;
 mod req_discord;
+mod req_misskey;
 mod req_nicovideo;
 mod time;
 mod vo;
@@ -21,6 +22,8 @@ use model::State;
 use req_discord::ReqDiscord;
 use req_nicovideo::ReqNicoVideo;
 
+use crate::req_misskey::ReqMisskey;
+
 #[tokio::main(flavor = "current_thread")]
 async fn main() {
     AppLogger::init().unwrap();
@@ -30,29 +33,40 @@ async fn main() {
         warn!(target: "nicow", ".env: Running dry-run mode.");
     }
 
-    let discord_repo = if !config.dryrun {
+    // Create dest repositories.
+    let (discord_repo, misskey_repo) = if !config.dryrun {
         let discord_repo = if let Some(config) = &config.discord {
-            Some(ReqDiscord::new(&config).await)
+            Some(ReqDiscord::new_async(&config).await)
         } else {
             None
         };
 
-        discord_repo
+        let misskey_repo = if let Some(config) = &config.misskey {
+            Some(ReqMisskey::new(&config))
+        } else {
+            None
+        };
+
+        (discord_repo, misskey_repo)
     } else {
-        None
+        (None, None)
     };
 
+    // Create repository.
     let mut repo: MainRepo = MainRepo {
         nico: ReqNicoVideo::new(&config),
         discord: discord_repo,
+        misskey: misskey_repo,
     };
 
     let mut state = State::Unretrieved;
 
     info!(target: "nicow", "main: Ready.");
 
+    // Acquire current server state.
     state.next_state(&mut repo).await;
 
+    // Acquire with schedule.
     for nt in Schedule::from_str(&config.cron).unwrap().after(&Utc::now()) {
         time::wait_until(nt).await;
 

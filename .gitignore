@@ -1,6 +1,6 @@
 /target
 .vscode
-config.toml
+bot_config.toml
 
 # Backward compatibility
 .env

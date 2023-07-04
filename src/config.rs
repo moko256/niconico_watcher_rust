@@ -4,17 +4,17 @@ use log::info;
 use serde::Deserialize;
 
 pub fn load_conf() -> Config {
-    let raw_config = read_to_string("config.toml");
+    let raw_config = read_to_string("bot_config.toml");
     match raw_config {
         Ok(raw_config) => {
             let config = get_conf(&raw_config);
 
-            info!(target: "nicow", "Parsing `config.toml` was successful!");
+            info!(target: "nicow", "Parsing `bot_config.toml` was successful!");
 
             return config;
         }
         Err(err) => {
-            panic!("Failed to read `config.toml`: {}", err);
+            panic!("Failed to read `bot_config.toml`: {}", err);
         }
     }
 }
@@ -48,9 +48,11 @@ pub struct DiscordConfig {
     pub bot_watching_target: String,
 }
 
-#[derive(PartialEq, Eq, Debug, Deserialize)]
+#[derive(PartialEq, Eq, Debug, Deserialize, Clone)]
 pub struct MisskeyConfig {
-    pub tokens: Vec<String>,
+    pub server_domain: String,
+    pub token: String,
+    pub post_footer: String,
 }
 
 #[cfg(test)]
@@ -72,7 +74,9 @@ mod tests {
                 bot_watching_target = "bot_watching_target"
 
                 [misskey]
-                tokens = ["t1","t2"]
+                server_domain = "example.com"
+                token = "token"
+                post_footer = "footer"
                 "#,
             ),
             Config {
@@ -86,7 +90,9 @@ mod tests {
                     bot_watching_target: "bot_watching_target".to_string(),
                 }),
                 misskey: Some(MisskeyConfig {
-                    tokens: vec!["t1".to_string(), "t2".to_string()]
+                    server_domain: "example.com".to_string(),
+                    token: "token".to_string(),
+                    post_footer: "footer".to_string(),
                 })
             }
         );

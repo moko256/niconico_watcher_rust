@@ -8,4 +8,6 @@ chid = [0] #discord-chid
 bot_watching_target = "ニコニコ動画"
 
 [misskey]
-tokens = ["misskey-token"]
+server_domain = "example.com"
+token = "misskey-token"
+post_footer = "#新着"

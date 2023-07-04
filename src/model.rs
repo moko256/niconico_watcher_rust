@@ -41,6 +41,9 @@ impl State {
                 }
             }
 
+            // For test
+            // repo.post_message(&next[0]).await;
+
             *self = State::RetrievedLast { movies: next };
         }
     }
