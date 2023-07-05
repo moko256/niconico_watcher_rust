@@ -26,13 +26,13 @@ impl Repo for MainRepo {
         // Post functions.
         let handle_discord = async {
             if let Some(discord) = &mut self.discord {
-                discord.post(&message).await;
+                discord.post(message).await;
             }
         };
 
         let handle_misskey = async {
             if let Some(misskey) = &mut self.misskey {
-                misskey.post(&message).await;
+                misskey.post(message).await;
             }
         };
 

@@ -11,7 +11,7 @@ pub fn load_conf() -> Config {
 
             info!(target: "nicow", "Parsing `bot_config.toml` was successful!");
 
-            return config;
+            config
         }
         Err(err) => {
             panic!("Failed to read `bot_config.toml`: {}", err);
@@ -22,9 +22,7 @@ pub fn load_conf() -> Config {
 pub fn get_conf(content: &str) -> Config {
     let config = toml::from_str::<Config>(content);
     match config {
-        Ok(config) => {
-            return config;
-        }
+        Ok(config) => config,
         Err(err) => {
             panic!("Failed to parse toml: {}", err);
         }

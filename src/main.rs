@@ -36,16 +36,15 @@ async fn main() {
     // Create dest repositories.
     let (discord_repo, misskey_repo) = if !config.dryrun {
         let discord_repo = if let Some(config) = &config.discord {
-            Some(ReqDiscord::new_async(&config).await)
+            Some(ReqDiscord::new_async(config).await)
         } else {
             None
         };
 
-        let misskey_repo = if let Some(config) = &config.misskey {
-            Some(ReqMisskey::new(&config))
-        } else {
-            None
-        };
+        let misskey_repo = config
+            .misskey
+            .as_ref()
+            .map(|config| ReqMisskey::new(&config));
 
         (discord_repo, misskey_repo)
     } else {
