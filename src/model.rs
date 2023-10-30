@@ -76,7 +76,7 @@ mod tests {
         NicoVideo {
             title: String::new(),
             content_id: format!("sm{}", i),
-            start_time: DateTime::parse_from_rfc3339(&format!("2022-02-1{}T00:00:00Z", i + 3))
+            start_time: DateTime::parse_from_rfc3339(&format!("2022-02-{:02}T00:00:00Z", i + 13))
                 .unwrap()
                 .with_timezone(&Utc),
         }
@@ -142,5 +142,138 @@ mod tests {
             vec![test_data(3)],
             vec![test_data(3)],
         );
+    }
+
+    // test for next_state()
+    struct TestRepo {
+        remote_movies: Option<Vec<NicoVideo>>,
+        posted_movies: Vec<NicoVideo>,
+    }
+
+    #[async_trait]
+    impl Repo for TestRepo {
+        async fn get_videos(&self) -> Option<Vec<NicoVideo>> {
+            self.remote_movies.clone()
+        }
+        async fn post_message(&mut self, message: &NicoVideo) {
+            self.posted_movies.push(message.clone());
+        }
+    }
+
+    impl TestRepo {
+        fn with_movies(movies: &[NicoVideo]) -> Self {
+            TestRepo {
+                remote_movies: Some(Vec::from(movies)),
+                posted_movies: Vec::new(),
+            }
+        }
+    }
+
+    async fn test_next_state_assert(
+        movies_retrieve_turn: &[&[NicoVideo]],
+        actual_posted: &[NicoVideo],
+    ) {
+        let mut posted: Vec<NicoVideo> = Vec::new();
+
+        let mut state = State::Unretrieved;
+        for movies in movies_retrieve_turn {
+            let mut repo = TestRepo::with_movies(movies);
+            state.next_state(&mut repo).await;
+            posted.append(&mut repo.posted_movies);
+        }
+        assert_eq!(actual_posted, posted);
+    }
+
+    #[tokio::test]
+    async fn test_next_state_1() {
+        test_next_state_assert(
+            &[
+                &[test_data(1)],
+                &[test_data(2), test_data(1)],               // Add 2
+                &[test_data(3), test_data(2), test_data(1)], // Add 3
+                &[test_data(4), test_data(3), test_data(2), test_data(1)], // Add 4
+            ],
+            &[test_data(2), test_data(3), test_data(4)],
+        )
+        .await;
+    }
+
+    #[tokio::test]
+    async fn test_next_state_2() {
+        test_next_state_assert(
+            &[
+                &[test_data(4), test_data(2), test_data(1)],
+                &[test_data(4), test_data(3), test_data(2)], // Add 3
+            ],
+            &[test_data(3)],
+        )
+        .await;
+    }
+
+    #[tokio::test]
+    async fn test_next_state_3() {
+        test_next_state_assert(
+            &[
+                &[test_data(4), test_data(3), test_data(2)],
+                &[test_data(4), test_data(2), test_data(1)], // Remove 3
+            ],
+            &[],
+        )
+        .await;
+    }
+
+    #[tokio::test]
+    async fn test_next_state_4() {
+        test_next_state_assert(&[&[], &[test_data(1)]], &[test_data(1)]).await; // Add 1
+    }
+
+    #[tokio::test]
+    async fn test_next_state_5() {
+        test_next_state_assert(&[&[test_data(1)], &[]], &[]).await; // Remove 1
+    }
+
+    #[tokio::test]
+    async fn test_next_state_6() {
+        test_next_state_assert(
+            &[
+                &[test_data(4), test_data(3), test_data(2)],
+                &[test_data(4), test_data(2), test_data(1)], // Remove 3
+                &[test_data(4), test_data(3), test_data(2)], // Re-add 3
+                &[test_data(4), test_data(2), test_data(1)], // Remove 3
+                &[test_data(4), test_data(3), test_data(2)], // Re-add 3
+            ],
+            &[],
+        )
+        .await;
+    }
+
+    #[tokio::test]
+    async fn test_next_state_7() {
+        test_next_state_assert(
+            &[
+                &[test_data(6), test_data(4), test_data(3)],
+                &[test_data(6), test_data(5), test_data(4)], // Add 5
+                &[test_data(6), test_data(4), test_data(3)], // Remove 5
+                &[test_data(6), test_data(5), test_data(4)], // Re-add 5
+                &[test_data(6), test_data(4), test_data(3)], // Remove 5
+                &[test_data(7), test_data(6), test_data(4)], // Add 7
+                &[test_data(7), test_data(6), test_data(5)], // Re-add 5
+            ],
+            &[test_data(5), test_data(7)],
+        )
+        .await;
+    }
+
+    #[tokio::test]
+    async fn test_next_state_8() {
+        test_next_state_assert(
+            &[
+                &[test_data(7), test_data(6), test_data(5)],
+                &[test_data(3), test_data(2), test_data(1)], // Seeing past result
+                &[test_data(7), test_data(6), test_data(5)], // Problem was fixed
+            ],
+            &[],
+        )
+        .await;
     }
 }
