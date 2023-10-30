@@ -5,7 +5,7 @@ use crate::vo::*;
 
 pub enum State {
     Unretrieved,
-    RetrievedLast { movies: Vec<NicoVideo> },
+    RetrievedLast { movies: Vec<NicoVideo> }, // first: oldest, last: newest
 }
 
 impl State {
@@ -15,23 +15,25 @@ impl State {
             .any(|prev_any| target.content_id == prev_any.content_id);
     }
 
-    fn movie_newer_than_oldest_prev(target: &NicoVideo, previous: &[NicoVideo]) -> bool {
-        let prev_most_old = previous.last();
-        prev_most_old.map_or(true, |prev_most_old| {
+    fn movie_newer_than_oldest_prev(target: &NicoVideo, oldest: Option<&NicoVideo>) -> bool {
+        oldest.map_or(true, |prev_most_old| {
             target.start_time > prev_most_old.start_time
         })
     }
 
-    fn movie_newer_eq_than_oldest_prev(target: &NicoVideo, previous: &[NicoVideo]) -> bool {
-        let prev_most_old = previous.last();
-        prev_most_old.map_or(true, |prev_most_old| {
+    fn movie_newer_eq_than_oldest_prev(target: &NicoVideo, oldest: Option<&NicoVideo>) -> bool {
+        oldest.map_or(true, |prev_most_old| {
             target.start_time >= prev_most_old.start_time
         })
     }
 
-    fn movie_postable(target: &NicoVideo, previous: &[NicoVideo]) -> bool {
+    fn movie_postable(
+        target: &NicoVideo,
+        previous: &[NicoVideo],
+        oldest: Option<&NicoVideo>,
+    ) -> bool {
         State::movie_not_contains_in_prev(target, previous)
-            && State::movie_newer_than_oldest_prev(target, previous)
+            && State::movie_newer_than_oldest_prev(target, oldest)
     }
 
     // Note: this algorithm does not consider when getVideos().len() > api query limit
@@ -43,17 +45,20 @@ impl State {
             } = self
             {
                 // Remove older video from queue.
-                current_movies.retain(|movie| Self::movie_newer_eq_than_oldest_prev(movie, &next));
+                let next_oldest = next.last(); // first: newest, last: oldest
+                current_movies
+                    .retain(|movie| Self::movie_newer_eq_than_oldest_prev(movie, next_oldest));
 
                 // Collect new videos.
                 //
                 // Exclude when
                 // - The movie is already posted.
                 // - The movie have forgotten whether posted, but older than the oldest in remembered.
+                let current_oldest = current_movies.first(); // first: oldest, last: newest
                 let new_movies: Vec<NicoVideo> = next
                     .into_iter()
                     .rev() // RSS has newer first, but bot must post older first.
-                    .filter(|video| State::movie_postable(&video, current_movies))
+                    .filter(|video| State::movie_postable(&video, current_movies, current_oldest))
                     .collect();
 
                 // For log.
@@ -70,7 +75,9 @@ impl State {
                     info!("Current queue item count: {}", current_movies.len());
                 }
             } else {
-                *self = State::RetrievedLast { movies: next };
+                *self = State::RetrievedLast {
+                    movies: next.into_iter().rev().collect(), // newest: first -> newest: last
+                };
             }
 
             // For test
@@ -136,10 +143,10 @@ mod tests {
         let (_, n, _) = test_datum();
         let old = false;
         let new = true;
-        assert_eq!(State::movie_newer_than_oldest_prev(&n, &[]), new);
-        assert_eq!(State::movie_newer_than_oldest_prev(&n, &[older]), new);
-        assert_eq!(State::movie_newer_than_oldest_prev(&n, &[nb]), old);
-        assert_eq!(State::movie_newer_than_oldest_prev(&n, &[newer]), old);
+        assert_eq!(State::movie_newer_than_oldest_prev(&n, None), new);
+        assert_eq!(State::movie_newer_than_oldest_prev(&n, Some(&older)), new);
+        assert_eq!(State::movie_newer_than_oldest_prev(&n, Some(&nb)), old);
+        assert_eq!(State::movie_newer_than_oldest_prev(&n, Some(&newer)), old);
     }
 
     #[test]
@@ -147,7 +154,7 @@ mod tests {
         let assert = |prev: Vec<NicoVideo>, next: Vec<NicoVideo>, expected: Vec<NicoVideo>| {
             let mut r = Vec::new();
             for n in next {
-                if State::movie_postable(&n, &prev) {
+                if State::movie_postable(&n, &prev, prev.first()) {
                     r.push(n);
                 }
             }
