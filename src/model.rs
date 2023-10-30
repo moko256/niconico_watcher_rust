@@ -21,6 +21,13 @@ impl State {
         })
     }
 
+    fn movie_newer_eq_than_oldest_prev(target: &NicoVideo, previous: &[NicoVideo]) -> bool {
+        let prev_most_old = previous.last();
+        prev_most_old.map_or(true, |prev_most_old| {
+            target.start_time >= prev_most_old.start_time
+        })
+    }
+
     fn movie_postable(target: &NicoVideo, previous: &[NicoVideo]) -> bool {
         State::movie_not_contains_in_prev(target, previous)
             && State::movie_newer_than_oldest_prev(target, previous)
@@ -30,21 +37,36 @@ impl State {
     pub async fn next_state(&mut self, repo: &mut impl Repo) {
         let data = repo.get_videos().await;
         if let Some(next) = data {
-            if let State::RetrievedLast { movies: previous } = self {
-                for n in next.iter().rev() {
-                    // Exclude when
-                    // - The movie is already posted.
-                    // - The movie have forgotten whether posted, but older than the oldest in remembered.
-                    if State::movie_postable(n, previous) {
-                        repo.post_message(n).await;
-                    }
+            if let State::RetrievedLast {
+                movies: current_movies,
+            } = self
+            {
+                // Remove older video from queue.
+                current_movies.retain(|movie| Self::movie_newer_eq_than_oldest_prev(movie, &next));
+
+                // Collect new videos.
+                //
+                // Exclude when
+                // - The movie is already posted.
+                // - The movie have forgotten whether posted, but older than the oldest in remembered.
+                let new_movies: Vec<NicoVideo> = next
+                    .into_iter()
+                    .rev() // RSS has newer first, but bot must post older first.
+                    .filter(|video| State::movie_postable(&video, current_movies))
+                    .collect();
+
+                // Post and add to queue.
+                for movie in new_movies.into_iter() {
+                    repo.post_message(&movie).await;
+
+                    current_movies.push(movie);
                 }
+            } else {
+                *self = State::RetrievedLast { movies: next };
             }
 
             // For test
             // repo.post_message(&next[0]).await;
-
-            *self = State::RetrievedLast { movies: next };
         }
     }
 }
