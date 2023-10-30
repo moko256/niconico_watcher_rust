@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use log::info;
 
 use crate::vo::*;
 
@@ -55,11 +56,18 @@ impl State {
                     .filter(|video| State::movie_postable(&video, current_movies))
                     .collect();
 
+                // For log.
+                let queue_modified = new_movies.len() > 0;
+
                 // Post and add to queue.
                 for movie in new_movies.into_iter() {
                     repo.post_message(&movie).await;
 
                     current_movies.push(movie);
+                }
+
+                if queue_modified {
+                    info!("Current queue item count: {}", current_movies.len());
                 }
             } else {
                 *self = State::RetrievedLast { movies: next };
@@ -195,6 +203,14 @@ mod tests {
         movies_retrieve_turn: &[&[NicoVideo]],
         actual_posted: &[NicoVideo],
     ) {
+        test_next_state_assert_queue(movies_retrieve_turn, actual_posted, None).await;
+    }
+
+    async fn test_next_state_assert_queue(
+        movies_retrieve_turn: &[&[NicoVideo]],
+        actual_posted: &[NicoVideo],
+        queue: Option<&[NicoVideo]>,
+    ) {
         let mut posted: Vec<NicoVideo> = Vec::new();
 
         let mut state = State::Unretrieved;
@@ -204,6 +220,14 @@ mod tests {
             posted.append(&mut repo.posted_movies);
         }
         assert_eq!(actual_posted, posted);
+
+        if let Some(queue) = queue {
+            if let State::RetrievedLast { movies } = state {
+                assert_eq!(queue, movies);
+            } else {
+                assert_eq!(queue, vec![]);
+            }
+        }
     }
 
     #[tokio::test]
@@ -295,6 +319,32 @@ mod tests {
                 &[test_data(7), test_data(6), test_data(5)], // Problem was fixed
             ],
             &[],
+        )
+        .await;
+    }
+
+    #[tokio::test]
+    async fn test_next_state_9() {
+        test_next_state_assert_queue(
+            &[
+                &[test_data(1)],
+                &[test_data(2), test_data(1)], // Add 2
+            ],
+            &[test_data(2)],
+            Some(&[test_data(1), test_data(2)]), // Queue has 2
+        )
+        .await;
+    }
+
+    #[tokio::test]
+    async fn test_next_state_10() {
+        test_next_state_assert_queue(
+            &[
+                &[test_data(3), test_data(2), test_data(1)],
+                &[test_data(6), test_data(5), test_data(4)],
+            ],
+            &[test_data(4), test_data(5), test_data(6)],
+            Some(&[test_data(4), test_data(5), test_data(6)]), // Queue remove older.
         )
         .await;
     }
