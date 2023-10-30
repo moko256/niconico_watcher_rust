@@ -151,9 +151,7 @@ mod tests {
                     r.push(n);
                 }
             }
-            for (a, e) in r.iter().zip(expected) {
-                assert_eq!(e.content_id, a.content_id);
-            }
+            assert_eq!(expected, r);
         };
 
         assert(
@@ -345,6 +343,21 @@ mod tests {
             ],
             &[test_data(4), test_data(5), test_data(6)],
             Some(&[test_data(4), test_data(5), test_data(6)]), // Queue remove older.
+        )
+        .await;
+    }
+
+    #[tokio::test]
+    async fn test_next_state_11() {
+        test_next_state_assert(
+            &[
+                &[test_data(3)],
+                &[test_data(4), test_data(3)],
+                &[test_data(6), test_data(4), test_data(3)],
+                &[test_data(7), test_data(6), test_data(4), test_data(3)],
+                &[test_data(7), test_data(5), test_data(4), test_data(1)],
+            ],
+            &[test_data(4), test_data(6), test_data(7), test_data(5)],
         )
         .await;
     }
