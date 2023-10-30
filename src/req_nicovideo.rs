@@ -41,7 +41,7 @@ impl ReqNicoVideo {
         match result {
             Ok(video) => Some(video),
             Err(e) => {
-                error!(target: "nicow", "HTTP: {}", e);
+                error!("HTTP: {}", e);
                 None
             }
         }

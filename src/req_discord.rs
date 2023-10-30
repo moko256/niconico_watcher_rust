@@ -67,6 +67,6 @@ impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, _data_about_bot: Ready) {
         ctx.set_activity(Activity::watching(&self.bot_watching_target))
             .await;
-        info!(target: "nicow", "Discord: Set status.");
+        info!("Discord: Set status.");
     }
 }

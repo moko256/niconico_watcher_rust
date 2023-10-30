@@ -707,6 +707,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "moko256_systemd_stdio_logger"
+version = "1.0.1"
+source = "git+https://github.com/moko256/moko256_systemd_stdio_logger_rust.git?tag=v1.0.1#b745487056437865717a8ae456a445f6ded4309c"
+dependencies = [
+ "log",
+]
+
+[[package]]
 name = "native-tls"
 version = "0.2.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -734,6 +742,7 @@ dependencies = [
  "cron",
  "form_urlencoded",
  "log",
+ "moko256_systemd_stdio_logger",
  "quick-xml",
  "reqwest",
  "rss",

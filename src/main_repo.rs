@@ -21,7 +21,7 @@ impl Repo for MainRepo {
 
     async fn post_message(&mut self, message: &NicoVideo) {
         // New movie: sm000 "title"
-        info!(target: "nicow", "New Movie: {} \"{}\"", message.content_id, message.title);
+        info!("New Movie: {} \"{}\"", message.content_id, message.title);
 
         // Post functions.
         let handle_discord = async {

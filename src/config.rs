@@ -9,7 +9,7 @@ pub fn load_conf() -> Config {
         Ok(raw_config) => {
             let config = get_conf(&raw_config);
 
-            info!(target: "nicow", "Parsing `bot_config.toml` was successful!");
+            info!("Parsing `bot_config.toml` was successful!");
 
             config
         }

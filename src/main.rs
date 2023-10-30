@@ -4,8 +4,8 @@ use chrono::Utc;
 use cron::Schedule;
 use log::info;
 use log::warn;
+use moko256_systemd_stdio_logger as logger;
 
-mod app_logger;
 mod config;
 mod main_repo;
 mod model;
@@ -15,7 +15,6 @@ mod req_nicovideo;
 mod time;
 mod vo;
 
-use app_logger::AppLogger;
 use config::*;
 use main_repo::MainRepo;
 use model::State;
@@ -26,11 +25,15 @@ use crate::req_misskey::ReqMisskey;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() {
-    AppLogger::init().unwrap();
+    logger::init([
+        logger::LoggerModuleFilterKey::Module(module_path!(), log::LevelFilter::Info),
+        logger::LoggerModuleFilterKey::Default(log::LevelFilter::Warn),
+    ])
+    .unwrap();
 
     let config = load_conf();
     if config.dryrun {
-        warn!(target: "nicow", "main: Running dry-run mode.");
+        warn!("main: Running dry-run mode.");
     }
 
     // Create dest repositories.
@@ -60,7 +63,7 @@ async fn main() {
 
     let mut state = State::Unretrieved;
 
-    info!(target: "nicow", "main: Ready.");
+    info!("main: Ready.");
 
     // Acquire current server state.
     state.next_state(&mut repo).await;
