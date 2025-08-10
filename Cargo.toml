@@ -53,3 +53,7 @@ features = ["gzip", "json"]
 version = "0.12"
 default-features = false
 features = ["client", "http", "gateway", "model"]
+
+[lints.rust]
+unsafe_code = "forbid"
+future-incompatible = "forbid"
