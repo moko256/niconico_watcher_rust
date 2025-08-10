@@ -1,9 +1,9 @@
 use log::info;
+use serenity::all::ActivityData;
 use serenity::async_trait;
 use serenity::client::Context;
 use serenity::client::EventHandler;
 use serenity::http::Http;
-use serenity::model::gateway::Activity;
 use serenity::model::gateway::Ready;
 use serenity::model::id::ChannelId;
 use serenity::Client;
@@ -26,13 +26,13 @@ impl ReqDiscord {
             .await
             .unwrap();
 
-        let http = Arc::clone(&client.cache_and_http.http);
+        let http = Arc::clone(&client.http);
 
         tokio::spawn(async move {
             client.start().await.unwrap();
         });
 
-        let ch = config.chid.iter().map(|id| ChannelId(*id)).collect();
+        let ch = config.chid.iter().map(|id| ChannelId::new(*id)).collect();
 
         ReqDiscord { http, ch }
     }
@@ -65,8 +65,7 @@ struct Handler {
 #[async_trait]
 impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, _data_about_bot: Ready) {
-        ctx.set_activity(Activity::watching(&self.bot_watching_target))
-            .await;
+        ctx.set_activity(Some(ActivityData::watching(&self.bot_watching_target)));
         info!("Discord: Set status.");
     }
 }
