@@ -24,22 +24,18 @@ impl ReqMisskey {
         let result = self.post_in(video).await;
 
         if let Err(err) = result {
-            log::error!(
-                "Failed to post `https://nico.ms/{}` to Misskey: {}",
-                video.content_id,
-                err
-            );
+            log::error!("Failed to post `{}` to Misskey: {}", video.url, err);
         }
     }
 
     async fn post_in(&mut self, video: &NicoVideo) -> Result<(), reqwest::Error> {
         //【新着動画】title
-        //ttps://nico.ms/sm000
+        //https://example.com
         //
         //footer
         let msg = format!(
-            "**【新着動画】**{}\nhttps://nico.ms/{}\n\n{}",
-            video.title, video.content_id, self.config.post_footer,
+            "**【新着動画】**{}\n{}\n\n{}",
+            video.title, video.url, self.config.post_footer,
         );
 
         let url = format!("https://{}/api/notes/create", self.config.server_domain);

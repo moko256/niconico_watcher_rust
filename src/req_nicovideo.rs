@@ -70,25 +70,28 @@ impl ReqNicoVideo {
 
         let mut videos = Vec::with_capacity(channels.len());
         for channel in channels {
-            let title = channel.title().unwrap();
-            videos.push(NicoVideo {
-                title: String::from_str(
-                    entity_unescape(title)
-                        .unwrap_or(Cow::Borrowed(title))
-                        .borrow(),
-                )?,
-                content_id: channel
-                    .guid()
-                    .unwrap()
-                    .value
-                    .split('/')
-                    .next_back()
-                    .unwrap()
-                    .to_owned(),
-                start_time: DateTime::parse_from_rfc2822(channel.pub_date().unwrap())
-                    .unwrap()
-                    .with_timezone(&Utc),
-            })
+            let raw_title = channel.title().unwrap();
+
+            let title = String::from_str(
+                entity_unescape(raw_title)
+                    .unwrap_or(Cow::Borrowed(raw_title))
+                    .borrow(),
+            )?;
+
+            let content_id = channel
+                .guid()
+                .unwrap()
+                .value
+                .split('/')
+                .next_back()
+                .unwrap()
+                .to_owned();
+
+            let start_time = DateTime::parse_from_rfc2822(channel.pub_date().unwrap())
+                .unwrap()
+                .with_timezone(&Utc);
+
+            videos.push(NicoVideo::new(title, content_id, start_time))
         }
 
         Ok(videos)

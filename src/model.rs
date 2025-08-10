@@ -110,13 +110,13 @@ mod tests {
     }
 
     fn test_data(i: i32) -> NicoVideo {
-        NicoVideo {
-            title: String::new(),
-            content_id: format!("sm{}", i),
-            start_time: DateTime::parse_from_rfc3339(&format!("2022-02-{:02}T00:00:00Z", i + 13))
-                .unwrap()
-                .with_timezone(&Utc),
-        }
+        let title = String::new();
+        let content_id = format!("sm{}", i);
+        let start_time = DateTime::parse_from_rfc3339(&format!("2022-02-{:02}T00:00:00Z", i + 13))
+            .unwrap()
+            .with_timezone(&Utc);
+
+        NicoVideo::new(title, content_id, start_time)
     }
 
     #[test]

@@ -39,18 +39,15 @@ impl ReqDiscord {
 
     pub async fn post(&mut self, video: &NicoVideo) {
         //【新着動画】title
-        //ttps://nico.ms/sm000
-        let msg = format!(
-            "**【新着動画】**{}\nhttps://nico.ms/{}",
-            video.title, video.content_id
-        );
+        //https://example.com
+        let msg = format!("**【新着動画】**{}\n{}", video.title, video.url);
         for ch in self.ch.iter() {
             let result = ch.say(Arc::clone(&self.http), &msg).await;
 
             if let Err(err) = result {
                 log::error!(
-                    "Failed to post `https://nico.ms/{}` to Discord (chid: {}): {}",
-                    video.content_id,
+                    "Failed to post `{}` to Discord (chid: {}): {}",
+                    video.url,
                     ch,
                     err
                 );
