@@ -10,19 +10,19 @@ pub enum State {
 
 impl State {
     fn movie_not_contains_in_prev(target: &NicoVideo, previous: &[NicoVideo]) -> bool {
-        return !previous
+        !previous
             .iter()
-            .any(|prev_any| target.content_id == prev_any.content_id);
+            .any(|prev_any| target.content_id == prev_any.content_id)
     }
 
     fn movie_newer_than_oldest_prev(target: &NicoVideo, oldest: Option<&NicoVideo>) -> bool {
-        oldest.map_or(true, |prev_most_old| {
+        oldest.is_none_or(|prev_most_old| {
             target.start_time > prev_most_old.start_time
         })
     }
 
     fn movie_newer_eq_than_oldest_prev(target: &NicoVideo, oldest: Option<&NicoVideo>) -> bool {
-        oldest.map_or(true, |prev_most_old| {
+        oldest.is_none_or(|prev_most_old| {
             target.start_time >= prev_most_old.start_time
         })
     }
@@ -58,11 +58,11 @@ impl State {
                 let new_movies: Vec<NicoVideo> = next
                     .into_iter()
                     .rev() // RSS has newer first, but bot must post older first.
-                    .filter(|video| State::movie_postable(&video, current_movies, current_oldest))
+                    .filter(|video| State::movie_postable(video, current_movies, current_oldest))
                     .collect();
 
                 // For log.
-                let queue_modified = new_movies.len() > 0;
+                let queue_modified = !new_movies.is_empty();
 
                 // Post and add to queue.
                 for movie in new_movies.into_iter() {

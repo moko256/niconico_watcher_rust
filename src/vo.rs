@@ -23,6 +23,6 @@ impl NicoVideo {
     }
 
     fn content_id_to_url(content_id: &str) -> String {
-        return format!("https://www.nicovideo.jp/watch/{}", content_id);
+        format!("https://www.nicovideo.jp/watch/{}", content_id)
     }
 }
