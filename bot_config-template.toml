@@ -1,6 +1,7 @@
 keyword = "keyword"
+# To post discord/misskey, set `false`.
 dryrun = true
-cron = "25 0/1 * * * *"
+cron = "25 0 7 * * *"
 
 # Optional
 # If you don't need this, remove this section.

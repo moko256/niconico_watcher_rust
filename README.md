@@ -1,5 +1,6 @@
 # niconico_watcher_rust
 This is a discord and misskey bot that watch niconico and notify a channel new videos, inspired by `zen510` and `nirsmmy` 's niconico_watcher.
+Note: due to API limitations, this bot only post videos posted before 5:00 each day.
 
 ## Usage
 - With ``cargo run``
@@ -19,3 +20,4 @@ This is a discord and misskey bot that watch niconico and notify a channel new v
 ## Reference
 - @zen510 @nirsmmy, ニコニコ動画用投稿通知 bot, https://github.com/zen510/niconico-watcher
 - RSSフィード一覧, ニコニコ動画まとめwiki, http://nicowiki.com/RSS%E3%83%95%E3%82%A3%E3%83%BC%E3%83%89%E4%B8%80%E8%A6%A7.html
+- ニコニコ動画 『スナップショット検索API v2』 ガイド, https://site.nicovideo.jp/search-api-docs/snapshot
