@@ -1,6 +1,8 @@
 use log::error;
 
 use reqwest::{Client, Response};
+use serde::Deserialize;
+use serde::Serialize;
 use std::borrow::Borrow;
 use std::borrow::Cow;
 use std::error::Error;
@@ -9,10 +11,7 @@ use std::str::FromStr;
 use chrono::DateTime;
 use chrono::Utc;
 
-use bytes::buf::Buf;
-
 use quick_xml::escape::unescape as entity_unescape;
-use rss::Channel;
 
 use form_urlencoded::byte_serialize;
 
@@ -49,7 +48,7 @@ impl ReqNicoVideo {
 
     async fn search_err(&self) -> Result<Vec<NicoVideo>, Box<dyn Error>> {
         let response = self.request().await?;
-        let response = if response.status() == 200 || response.status() == 404 {
+        let response = if response.status().is_success() {
             response
         } else {
             response.error_for_status()?
@@ -59,41 +58,47 @@ impl ReqNicoVideo {
 
     async fn request(&self) -> Result<Response, Box<dyn Error>> {
         let url = format!(
-            "https://www.nicovideo.jp/tag/{}?rss=rss2&sort=f&order=d&nodescription=1&nothumbnail=1&noinfo=1",
+            "https://snapshot.search.nicovideo.jp/api/v2/snapshot/video/contents/search?q={}&targets=tags&fields=contentId,title,startTime&_sort=-startTime&_limit={}",
             self.query,
+            MAX_VIDEO_COUNT,
         );
         Ok(self.client.get(&url).send().await?)
     }
 
     async fn parse(&self, response: Response) -> Result<Vec<NicoVideo>, Box<dyn Error>> {
-        let channels = Channel::read_from(response.bytes().await?.reader())?.items;
+        let result = response.json::<NicoVideoApiResult>().await?;
 
-        let mut videos = Vec::with_capacity(channels.len());
-        for channel in channels {
-            let raw_title = channel.title().unwrap();
+        let mut videos = Vec::with_capacity(result.data.len());
+        for video in result.data {
+            let raw_title = video.title;
 
             let title = String::from_str(
-                entity_unescape(raw_title)
-                    .unwrap_or(Cow::Borrowed(raw_title))
+                entity_unescape(&raw_title)
+                    .unwrap_or(Cow::Borrowed(&raw_title))
                     .borrow(),
             )?;
 
-            let content_id = channel
-                .guid()
-                .unwrap()
-                .value
-                .split('/')
-                .next_back()
-                .unwrap()
-                .to_owned();
-
-            let start_time = DateTime::parse_from_rfc2822(channel.pub_date().unwrap())
-                .unwrap()
-                .with_timezone(&Utc);
+            let content_id = video.content_id;
+            let start_time = video.start_time;
 
             videos.push(NicoVideo::new(title, content_id, start_time))
         }
 
         Ok(videos)
     }
+}
+
+const MAX_VIDEO_COUNT: u8 = 20;
+
+#[derive(Clone, Serialize, Deserialize)]
+struct NicoVideoApiResult {
+    pub data: Vec<NicoVideoApiVideo>,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct NicoVideoApiVideo {
+    pub title: String,
+    pub content_id: String,
+    pub start_time: DateTime<Utc>,
 }

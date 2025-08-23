@@ -161,6 +161,7 @@ dependencies = [
  "android-tzdata",
  "iana-time-zone",
  "num-traits",
+ "serde",
  "windows-link",
 ]
 
@@ -834,7 +835,6 @@ name = "niconico-watcher-rust"
 version = "0.1.0"
 dependencies = [
  "async-trait",
- "bytes",
  "chrono",
  "cron",
  "form_urlencoded",
@@ -842,7 +842,6 @@ dependencies = [
  "moko256_systemd_stdio_logger",
  "quick-xml",
  "reqwest",
- "rss",
  "serde",
  "serde_json",
  "serenity",
@@ -987,7 +986,6 @@ version = "0.37.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "331e97a1af0bf59823e6eadffe373d7b27f485be8748f71471c662c1f269b7fb"
 dependencies = [
- "encoding_rs",
  "memchr",
 ]
 
@@ -1096,15 +1094,6 @@ dependencies = [
  "libc",
  "untrusted",
  "windows-sys 0.52.0",
-]
-
-[[package]]
-name = "rss"
-version = "2.0.12"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b2107738f003660f0a91f56fd3e3bd3ab5d918b2ddaf1e1ec2136fb1c46f71bf"
-dependencies = [
- "quick-xml",
 ]
 
 [[package]]
