@@ -59,8 +59,7 @@ impl ReqNicoVideo {
     async fn request(&self) -> Result<Response, Box<dyn Error>> {
         let url = format!(
             "https://snapshot.search.nicovideo.jp/api/v2/snapshot/video/contents/search?q={}&targets=tags&fields=contentId,title,startTime&_sort=-startTime&_limit={}",
-            self.query,
-            MAX_VIDEO_COUNT,
+            self.query, MAX_VIDEO_COUNT,
         );
         Ok(self.client.get(&url).send().await?)
     }

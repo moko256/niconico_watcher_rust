@@ -16,15 +16,11 @@ impl State {
     }
 
     fn movie_newer_than_oldest_prev(target: &NicoVideo, oldest: Option<&NicoVideo>) -> bool {
-        oldest.is_none_or(|prev_most_old| {
-            target.start_time > prev_most_old.start_time
-        })
+        oldest.is_none_or(|prev_most_old| target.start_time > prev_most_old.start_time)
     }
 
     fn movie_newer_eq_than_oldest_prev(target: &NicoVideo, oldest: Option<&NicoVideo>) -> bool {
-        oldest.is_none_or(|prev_most_old| {
-            target.start_time >= prev_most_old.start_time
-        })
+        oldest.is_none_or(|prev_most_old| target.start_time >= prev_most_old.start_time)
     }
 
     fn movie_postable(

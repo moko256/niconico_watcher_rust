@@ -44,10 +44,7 @@ async fn main() {
             None
         };
 
-        let misskey_repo = config
-            .misskey
-            .as_ref()
-            .map(ReqMisskey::new);
+        let misskey_repo = config.misskey.as_ref().map(ReqMisskey::new);
 
         (discord_repo, misskey_repo)
     } else {

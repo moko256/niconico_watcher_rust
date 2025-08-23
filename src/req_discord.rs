@@ -1,4 +1,5 @@
 use log::info;
+use serenity::Client;
 use serenity::all::ActivityData;
 use serenity::async_trait;
 use serenity::client::Context;
@@ -6,7 +7,6 @@ use serenity::client::EventHandler;
 use serenity::http::Http;
 use serenity::model::gateway::Ready;
 use serenity::model::id::ChannelId;
-use serenity::Client;
 use std::sync::Arc;
 
 use crate::config::DiscordConfig;
