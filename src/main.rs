@@ -62,6 +62,16 @@ async fn main() {
     };
 
     let mut state = State::Unretrieved;
+    // For test
+    // let mut state = State::RetrievedLast {
+    //     movies: vec![NicoVideo::new(
+    //         String::new(),
+    //         String::new(),
+    //         DateTime::parse_from_rfc3339("2025-08-18T12:30:00Z")
+    //             .unwrap()
+    //             .into(),
+    //     )],
+    // };
 
     info!("main: Ready.");
 
